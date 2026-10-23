@@ -84,7 +84,7 @@ export interface CropCalendarPlan {
   fertilizationSchedule: FertilizationMilestone[];
 }
 
-const STORAGE_KEY = 'hurudza_planner_reminders_v1';
+const STORAGE_KEY = 'farmers_planner_reminders_v1';
 
 /**
  * Helper to add days to a date string YYYY-MM-DD
@@ -185,7 +185,7 @@ export function generateCropCalendarPlan(
     stageName: 'Pre-Planting Basal',
     description: 'Apply Compound D (7:14:7) at the bottom of each basin and cover with 2cm to 3cm of loose soil.',
     recommendedInput: 'Compound D (7% N, 14% P2O5, 7% K2O, 6.5% S)',
-    brandName: 'Windmill / ZFC Compound D',
+    brandName: 'Compound D (7:14:7) Basal Fertilizer',
     dosage: '1 standard beer bottle cap (10g) per basin (approx. 200kg/ha)',
     agritexAdvisory: 'CRITICAL: Never let seed touch pure chemical fertilizer. The 2cm soil separation layer is essential to prevent seed embryo burning.',
     weatherContext: 'Pre-placement allows phosphorus to dissolve as soon as the first planting rainfall occurs.',
@@ -198,7 +198,7 @@ export function generateCropCalendarPlan(
     date: basalDate,
     dap: -3,
     fertilizerName: 'Basal Compound D (7:14:7)',
-    brandProduct: 'Windmill / ZFC Compound D',
+    brandProduct: 'Compound D (7:14:7) Basal Fertilizer',
     dosagePerPlot: '14.5 kg per standard Pfumvudza plot (1,456 basins)',
     dosagePerHectare: '200 - 300 kg / ha',
     applicationTechnique: 'Band/Basin placement at bottom, covered with 2cm soil buffer',
@@ -215,7 +215,7 @@ export function generateCropCalendarPlan(
     stageName: 'Planting Day (0 DAP)',
     description: `Plant 2 certified seeds per basin into moist soil at 5cm depth. If dry-planting, wait for verified 25-30mm rain.`,
     recommendedInput: `Certified Seed: ${crop.recommendedVarieties.slice(0, 2).join(' or ')}`,
-    brandName: 'Seed Co / Pannar Certified Hybrid',
+    brandName: 'Certified Hybrid Seed (Thiram/Metalaxyl treated)',
     dosage: '1.0 kg seed per standard plot (25 kg/ha)',
     agritexAdvisory: `Check rainfall threshold: Regional requirement is ${regionCycle.optimalPlantingWindow.rainTriggerMm3Days}mm over 3 days before covering.`,
     weatherContext: `Sowing window for Region ${location.naturalRegion}: ${regionCycle.optimalPlantingWindow.earliestDate} to ${regionCycle.optimalPlantingWindow.latestRecommendedDate}.`,
@@ -252,8 +252,8 @@ export function generateCropCalendarPlan(
     type: 'scouting',
     stageName: 'Early Vegetative (21 DAP)',
     description: 'Scout the crop for Fall Armyworm (Mhungu) pinhole damage in leaf funnels. Remove early weeds before they steal nitrogen.',
-    recommendedInput: 'Agricura Karate Zeon or Ampligo + Hand weeding / Dutch hoe',
-    brandName: 'Agricura Karate Zeon 5CS',
+    recommendedInput: 'Karate Zeon or Ampligo + Hand weeding / Dutch hoe',
+    brandName: 'Karate Zeon 5CS',
     dosage: '15ml in 15L knapsack sprayer directed into whorls',
     agritexAdvisory: 'Early weeding gives a 30% yield advantage. Spray pests before 9am or after 4pm when larvae are feeding.',
     weatherContext: 'Frequent morning humidity can trigger early fungal spores.',
@@ -272,7 +272,7 @@ export function generateCropCalendarPlan(
     stageName: 'Knee Height (35 DAP)',
     description: 'Apply Ammonium Nitrate (34.5% N) at knee-height stage right after rain when the soil is damp.',
     recommendedInput: 'Ammonium Nitrate (AN) 34.5% Nitrogen',
-    brandName: 'Sable Chemicals / Windmill AN',
+    brandName: 'Ammonium Nitrate (AN 34.5% N)',
     dosage: '1 beer bottle cap (10g) per basin placed 5cm away from plant stem',
     agritexAdvisory: 'NEVER apply AN on bone-dry soil; the nitrogen will volatilize as ammonia gas into the air. Wait for soil dampness.',
     weatherContext: `Check Region ${location.naturalRegion} Dekad index: Soil moisture should be above 40% before AN top-dressing.`,
@@ -285,7 +285,7 @@ export function generateCropCalendarPlan(
     date: topDress1Date,
     dap: 35,
     fertilizerName: '1st Top Dressing - Ammonium Nitrate (34.5% N)',
-    brandProduct: 'Sable Chemicals / Windmill AN',
+    brandProduct: 'Ammonium Nitrate (AN 34.5% N)',
     dosagePerPlot: '14.5 kg per standard Pfumvudza plot (1,456 plants)',
     dosagePerHectare: '150 - 200 kg / ha',
     applicationTechnique: 'Surface spot placement 5cm-10cm from stalk, covered with mulch to minimize volatilization',
@@ -303,7 +303,7 @@ export function generateCropCalendarPlan(
     stageName: 'Pre-Tasseling (56 DAP)',
     description: 'Second split of Ammonium Nitrate (or urea) to boost cob elongation and grain sink potential.',
     recommendedInput: 'Ammonium Nitrate (AN 34.5% N)',
-    brandName: 'Sable Chemicals AN',
+    brandName: 'Ammonium Nitrate (AN 34.5% N)',
     dosage: '1/2 to 1 beer bottle cap (5-10g) per basin if soil moisture allows',
     agritexAdvisory: 'If mid-season dry spell is severe in Region III/IV, withhold this second split until the next rain.',
     weatherContext: `Historical dry spell window in Region ${location.naturalRegion}: ${regionCycle.criticalDrySpellRiskWindow.period}.`,
@@ -316,7 +316,7 @@ export function generateCropCalendarPlan(
     date: topDress2Date,
     dap: 56,
     fertilizerName: '2nd Top Dressing - Pre-Tasseling Nitrogen',
-    brandProduct: 'Sable Chemicals AN',
+    brandProduct: 'Ammonium Nitrate (AN 34.5% N)',
     dosagePerPlot: '7.5 kg - 10 kg per standard plot',
     dosagePerHectare: '100 - 150 kg / ha',
     applicationTechnique: 'Side-dress placement between basins',
@@ -409,7 +409,7 @@ export function generateCropCalendarPlan(
     stageName: 'Post-Harvest Protection',
     description: 'Shell grain when moisture is verified <= 12.5% with salt-bottle test or GMB moisture meter. Dust with grain protectant.',
     recommendedInput: 'Pirimiphos-methyl + Permethrin grain dust (Actellic Gold / Chirindamatura)',
-    brandName: 'Agricura Actellic Gold Dust',
+    brandName: 'Actellic Gold Dust',
     dosage: '50g sachet per 50kg bag of shelled grain (mix thoroughly)',
     agritexAdvisory: 'Treated grain in hermetic or clean woven bags protects against Large Grain Borer (Scania) for up to 12 months.',
     weatherContext: 'Winter season (Chando) conditions ensure cool, dry storage environment.',
@@ -603,7 +603,7 @@ export function saveReminders(reminders: PlannerReminder[]): void {
  */
 export function exportCalendarToIcs(
   plan: CropCalendarPlan,
-  farmerName = 'Hurudza Farmer'
+  farmerName = 'Master Farmer'
 ): void {
   const nowStr = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
   const cleanCropName = plan.cropName.replace(/[^a-zA-Z0-9 ]/g, '');
@@ -611,17 +611,17 @@ export function exportCalendarToIcs(
   let icsContent = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Hurudza Agro-Advisory Zimbabwe//Planting Harvest Planner//EN',
+    'PRODID:-//Farmers Dictionary Zw//Planting Harvest Planner//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
-    `X-WR-CALNAME:Hurudza ${cleanCropName} Agro-Calendar`,
+    `X-WR-CALNAME:Farmers Dictionary Zw ${cleanCropName} Agro-Calendar`,
     `X-WR-TIMEZONE:Africa/Harare`,
   ];
 
   plan.milestones.forEach((ms) => {
     const dateFormatted = ms.date.replace(/-/g, '');
-    const uid = `${ms.id}-${dateFormatted}@hurudza.agro.zw`;
-    const summary = `[Hurudza] ${ms.title}`;
+    const uid = `${ms.id}-${dateFormatted}@farmersdict.agro.zw`;
+    const summary = `[Farmers Dictionary Zw] ${ms.title}`;
     const description = `Stage: ${ms.stageName}\\nInput: ${ms.recommendedInput}\\nDosage: ${ms.dosage}\\nAgritex Advisory: ${ms.agritexAdvisory}\\nLocation: ${plan.location.name} (Region ${plan.location.naturalRegion})`;
 
     icsContent.push(
@@ -650,9 +650,52 @@ export function exportCalendarToIcs(
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', `Hurudza_${cleanCropName.replace(/\s+/g, '_')}_Calendar_${plan.location.district}.ics`);
+  link.setAttribute('download', `Farmers_Dictionary_Zw_${cleanCropName.replace(/\s+/g, '_')}_Calendar_${plan.location.district}.ics`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+/**
+ * Formats a comprehensive planting and harvest plan into a WhatsApp shareable message
+ */
+export function buildPlantingHarvestWhatsAppShare(plan: CropCalendarPlan, location: ZimbabweLocation): string {
+  const farmingSystemLabels: Record<string, string> = {
+    rainfed_pfumvudza: 'Pfumvudza Basins + Mulch (Rainfed)',
+    conventional_rainfed: 'Conventional Ploughed (Rainfed)',
+    supplementary_irrigation: 'Supplementary Irrigation (Borehole / Weir)',
+    full_irrigation: 'Full Irrigation Scheme (Drip / Furrow)'
+  };
+
+  const systemLabel = farmingSystemLabels[plan.farmingSystem] || plan.farmingSystem;
+
+  const milestonesList = plan.milestones
+    .slice(0, 8)
+    .map((m, idx) => {
+      const dapPrefix = m.dayOffset >= 0 ? `+${m.dayOffset}` : `${m.dayOffset}`;
+      return `${idx + 1}. *${formatFriendlyDate(m.date)} (${dapPrefix} DAP):* ${m.title}\n   • Stage: ${m.stageName}\n   • Input: ${m.recommendedInput || 'Field inspection'}${m.dosage ? ` (${m.dosage})` : ''}\n   • Advisory: ${m.agritexAdvisory}`;
+    })
+    .join('\n\n');
+
+  return `📅 *FARMERS DICTIONARY ZW • PLANTING & HARVEST SCHEDULE*
+━━━━━━━━━━━━━━━━━━━━━
+🌾 *Crop:* ${plan.cropName} ${plan.shonaName ? `(${plan.shonaName})` : ''} ${plan.ndebeleName ? `• ${plan.ndebeleName}` : ''}
+📍 *Location:* ${location.name}, ${location.province} • Natural Region ${location.naturalRegion}
+🌱 *Sowing Date:* ${formatFriendlyDate(plan.sowingDate)}
+🚜 *Production System:* ${systemLabel}
+⏳ *Total Maturity Cycle:* ${plan.totalDurationDays} Days
+🏁 *Estimated Harvest Window:* ${formatFriendlyDate(plan.projectedHarvestDate)}
+
+📊 *Core Step-by-Step Agronomy Milestones:*
+${milestonesList}
+
+💡 *Official Agritex Field Protocols:*
+• Ensure minimum 25mm planting rain before sowing seed into basins.
+• Calibrate knapsack sprayers with clean water before mixing any chemicals.
+• Maintain continuous Pfumvudza mulch cover to suppress weeds and conserve soil moisture.
+
+━━━━━━━━━━━━━━━━━━━━━
+_Farmers Dictionary Zw • Precision Agro-Advisory Engine_`;
+}
+

@@ -1,5 +1,5 @@
 {
-  "name": "Hurudza - Zimbabwe Smart Agro-Advisory",
+  "name": "Farmers Dictionary Zw - Zimbabwe Smart Agro-Advisory",
   "description": "Real-time agro-advisory system for Zimbabwe smallholder farmers featuring crop & livestock recommendations, weather indices, AI pest/disease diagnostics, geo-fencing, and live market prices.",
   "requestFramePermissions": ["camera"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

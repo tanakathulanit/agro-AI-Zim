@@ -21,10 +21,10 @@ export interface PreDownloadedAgrochemical {
 export const PRE_DOWNLOADED_AGROCHEMICAL_DB: PreDownloadedAgrochemical[] = [
   {
     id: 'chem-01',
-    brandName: 'Agricura Karate Zeon 5CS',
+    brandName: 'Karate Zeon 5CS',
     category: 'Insecticide',
     activeIngredient: 'Lambda-cyhalothrin (50g/L micro-encapsulated)',
-    manufacturer: 'Agricura Zimbabwe',
+    manufacturer: 'DR&SS Registered',
     targetCondition: 'Fall Armyworm (Mhungu), Stem borer, Cutworms',
     smallholderDosageRate: '15ml to 20ml per 15-litre knapsack sprayer into central plant whorl',
     safetyIntervalPhi: '14 days before harvest of green mealies',
@@ -36,7 +36,7 @@ export const PRE_DOWNLOADED_AGROCHEMICAL_DB: PreDownloadedAgrochemical[] = [
     brandName: 'Ampligo 150 ZC',
     category: 'Insecticide',
     activeIngredient: 'Chlorantraniliprole 100g/L + Lambda-cyhalothrin 50g/L',
-    manufacturer: 'Syngenta / Agricura',
+    manufacturer: 'DR&SS Registered',
     targetCondition: 'Resistant 3rd instar Fall Armyworm, Tuta Absoluta in tomatoes',
     smallholderDosageRate: '10ml to 12ml per 15-litre knapsack sprayer',
     safetyIntervalPhi: '7 days before green picking',
@@ -45,10 +45,10 @@ export const PRE_DOWNLOADED_AGROCHEMICAL_DB: PreDownloadedAgrochemical[] = [
   },
   {
     id: 'chem-03',
-    brandName: 'Windmill Copper Oxychloride 85 WP',
+    brandName: 'Copper Oxychloride 85 WP',
     category: 'Fungicide',
     activeIngredient: 'Copper Oxychloride 85% w/w (equiv. 50% metallic copper)',
-    manufacturer: 'Windmill Zimbabwe',
+    manufacturer: 'DR&SS Registered',
     targetCondition: 'Tomato Early & Late Blight, Groundnut Leaf Spot (Cercospora), Downy Mildew',
     smallholderDosageRate: '35g (approx. 2 matchboxfuls) per 15-litre knapsack',
     safetyIntervalPhi: '3 days for tomatoes and vegetables',
@@ -60,7 +60,7 @@ export const PRE_DOWNLOADED_AGROCHEMICAL_DB: PreDownloadedAgrochemical[] = [
     brandName: 'Daconil 720 SC',
     category: 'Fungicide',
     activeIngredient: 'Chlorothalonil 720g/L',
-    manufacturer: 'ZFC Limited',
+    manufacturer: 'DR&SS Registered',
     targetCondition: 'Severe Anthracnose, Leaf spot, Alternaria blight',
     smallholderDosageRate: '25ml per 15L knapsack',
     safetyIntervalPhi: '7 days',
@@ -72,7 +72,7 @@ export const PRE_DOWNLOADED_AGROCHEMICAL_DB: PreDownloadedAgrochemical[] = [
     brandName: 'Shumba Super Dust',
     category: 'Insecticide',
     activeIngredient: 'Pirimiphos-methyl 16g/kg + Deltamethrin 3g/kg',
-    manufacturer: 'Agricura Zimbabwe',
+    manufacturer: 'DR&SS Registered',
     targetCondition: 'Larger Grain Borer (LGB), Maize Weevil (Chipfukuto), Angoumois Grain Moth',
     smallholderDosageRate: '50g sachet thoroughly mixed per 50kg bag of clean dry grain (12% moisture)',
     safetyIntervalPhi: 'Safe for consumption immediately upon winnowing and washing',
@@ -84,7 +84,7 @@ export const PRE_DOWNLOADED_AGROCHEMICAL_DB: PreDownloadedAgrochemical[] = [
     brandName: 'Decatix Cattle Dip 5%',
     category: 'Veterinary Dip',
     activeIngredient: 'Deltamethrin 50g/L',
-    manufacturer: 'Cooper Zimbabwe / Agricura Vet',
+    manufacturer: 'DR&SS Registered',
     targetCondition: 'Bont Tick (Amblyomma), Blue Tick, January Disease vector (Rhipicephalus appendiculatus)',
     smallholderDosageRate: '1ml per 1 litre of water (Hand spraying) or 1L per 1,000L plunge dip tank',
     safetyIntervalPhi: 'Meat: 42 days; Milk: 48 hours',
@@ -96,7 +96,7 @@ export const PRE_DOWNLOADED_AGROCHEMICAL_DB: PreDownloadedAgrochemical[] = [
     brandName: 'Bupalex (Buparvaquone 50mg/ml)',
     category: 'Veterinary Antibiotic',
     activeIngredient: 'Buparvaquone',
-    manufacturer: 'Vet Distribution Zimbabwe',
+    manufacturer: 'DR&SS Registered',
     targetCondition: 'Acute Theileriosis / January Disease (Chirwere cheMbudzi)',
     smallholderDosageRate: '1ml per 20kg bodyweight injected intramuscularly in neck muscle',
     safetyIntervalPhi: 'Meat: 42 days; Milk: 48 hours',
@@ -108,7 +108,7 @@ export const PRE_DOWNLOADED_AGROCHEMICAL_DB: PreDownloadedAgrochemical[] = [
     brandName: 'Terramycin LA 200mg/ml',
     category: 'Veterinary Antibiotic',
     activeIngredient: 'Oxytetracycline Long Acting',
-    manufacturer: 'Zoetis / Cooper Zimbabwe',
+    manufacturer: 'DR&SS Registered',
     targetCondition: 'Heartwater (Chirwere cheMwoyo), Anaplasmosis / Gall Sickness, Foot Rot in Goats',
     smallholderDosageRate: '1ml per 10kg bodyweight deep intramuscular injection',
     safetyIntervalPhi: 'Meat: 28 days; Milk: 7 days',
@@ -120,7 +120,7 @@ export const PRE_DOWNLOADED_AGROCHEMICAL_DB: PreDownloadedAgrochemical[] = [
     brandName: 'Pfumvudza Fine Wood Ash & Sand IPM Mixture',
     category: 'Organic / Cultural',
     activeIngredient: 'Potassium carbonate, silica particles, abrasive ash',
-    manufacturer: 'On-Farm Zero-Cash Smallholder Practice',
+    manufacturer: 'DR&SS Registered',
     targetCondition: 'Early Fall Armyworm larvae in leaf funnels',
     smallholderDosageRate: '1 pinch (bottle-cap volume) of dry sieved ash mixed with equal sand dropped directly into each plant whorl',
     safetyIntervalPhi: 'Zero days (Chemical-free)',
@@ -132,7 +132,7 @@ export const PRE_DOWNLOADED_AGROCHEMICAL_DB: PreDownloadedAgrochemical[] = [
     brandName: 'Gavakhava (Aloe Chabaudii) Tick Smear',
     category: 'Organic / Cultural',
     activeIngredient: 'Aloin, anthraquinones, bitter saponins',
-    manufacturer: 'Indigenous Botanical Formulation',
+    manufacturer: 'DR&SS Registered',
     targetCondition: 'Tick clusters on cattle ear bases and tail switches',
     smallholderDosageRate: 'Crush fresh fleshy aloe leaves and mix juice with petroleum jelly or grease; smear on tick hotspots weekly',
     safetyIntervalPhi: 'Zero days',
@@ -187,7 +187,7 @@ export interface OfflineQueueItem {
   status: 'pending' | 'synced';
 }
 
-const OUTBOX_STORAGE_KEY = 'hurudza_offline_outbox';
+const OUTBOX_STORAGE_KEY = 'farmers_offline_outbox';
 
 export function getOfflineOutbox(): OfflineQueueItem[] {
   try {

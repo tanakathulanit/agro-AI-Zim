@@ -1,9 +1,13 @@
+import { ALL_EXPANDED_CROPS } from './allCropsDatabase';
+
 export interface InputScheduleItem {
   stage: string;
   timingDap: string; // Days after planting
   task: string;
   recommendedInput: string;
   brandName: string;
+  registrationNumber?: string;
+  activeIngredient?: string;
   applicationRate: string;
   pfumvudzaPlotRate: string; // For 1 standard Pfumvudza plot (62.4m x 16m = approx 1/16 ha)
   estimatedCostUsd: number;
@@ -15,20 +19,21 @@ export interface CropRecommendation {
   name: string;
   shonaName?: string;
   ndebeleName?: string;
-  category: 'Cereal' | 'Legume' | 'Oilseed' | 'Tuber' | 'Small Grain';
+  category: 'Cereal' | 'Legume' | 'Oilseed' | 'Tuber' | 'Small Grain' | 'Horticulture' | 'Cash Crop';
+  seasonType?: 'Summer Rainfed' | 'Winter Irrigated' | 'All Season / Year-Round' | 'Late Catch Crop';
   suitableRegions: ('I' | 'IIa' | 'IIb' | 'III' | 'IV' | 'V')[];
   recommendedVarieties: string[];
   rainfallRequirementMm: { min: number; max: number };
   maturityDays: number;
   expectedYieldTonPerHa: { low: number; avg: number; high: number };
-  pfumvudzaYieldBags: { low: number; avg: number; high: number }; // 50kg bags per plot
+  pfumvudzaYieldBags: { low: number; avg: number; high: number }; // 50kg bags or pockets/crates per plot
   suitabilityScore: number; // 0-100 calculated dynamically
   suitabilityReason: string;
   plantingTriggerCondition: string;
   zeroToMaturitySchedule: InputScheduleItem[];
 }
 
-export const MASTER_CROPS: CropRecommendation[] = [
+const BASE_CROPS: CropRecommendation[] = [
   {
     cropId: 'maize_medium',
     name: 'Hybrid White Maize (Medium Maturity)',
@@ -50,7 +55,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '-14 to 0 DAP',
         task: 'Dig Pfumvudza planting basins (15cm x 15cm x 15cm at 75cm x 60cm spacing) & place mulch.',
         recommendedInput: 'Compound D (7:14:7) + Well-decomposed Kraal Manure or Compost',
-        brandName: 'Windmill Compound D / ZFC Compound D',
+        brandName: 'Compound D (7:14:7) Basal',
         applicationRate: '200 - 300 kg/ha',
         pfumvudzaPlotRate: '1 standard beer bottle cap (10g) per basin covered by 2cm soil',
         estimatedCostUsd: 38.00,
@@ -61,7 +66,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '0 DAP',
         task: 'Drop 2 seeds per basin; thin to 1 vigorous plant at 14 DAP or maintain 2 if soil moisture is exceptional.',
         recommendedInput: 'Certified Hybrid Seed (Thiram/Metalaxyl treated)',
-        brandName: 'Seed Co SC 637 / SC 649 (Red bag with tamper seal)',
+        brandName: 'SC 637 / SC 649 Certified Seed (Tamper sealed)',
         applicationRate: '25 kg/ha',
         pfumvudzaPlotRate: '1 kg certified seed per plot (1,456 basins)',
         estimatedCostUsd: 12.00,
@@ -72,7 +77,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '7 to 14 DAP',
         task: 'Early scouting for Fall Armyworm (Mhungu) and cutworms.',
         recommendedInput: 'Lambda-cyhalothrin or Wood ash/sand pinch',
-        brandName: 'Agricura Karate Zeon 5CS or Ampligo',
+        brandName: 'Karate Zeon 5CS or Ampligo',
         applicationRate: '100 - 150 ml/ha',
         pfumvudzaPlotRate: '15 ml per 15L knapsack sprayer or wood ash pinch',
         estimatedCostUsd: 6.50,
@@ -83,7 +88,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '28 to 35 DAP',
         task: 'Apply first split of nitrogen top dressing at knee-high stage.',
         recommendedInput: 'Ammonium Nitrate (AN 34.5% N)',
-        brandName: 'Sable Chemicals / ZFC AN / Windmill Top Dressing',
+        brandName: 'Ammonium Nitrate (AN 34.5% N)',
         applicationRate: '150 kg/ha',
         pfumvudzaPlotRate: '1 beer bottle cap (5g) per plant, 5cm away from stalk',
         estimatedCostUsd: 42.00,
@@ -94,7 +99,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '50 to 58 DAP',
         task: 'Apply second split of nitrogen top dressing right before tasseling.',
         recommendedInput: 'Ammonium Nitrate (AN 34.5% N)',
-        brandName: 'ZFC Ammonium Nitrate',
+        brandName: 'Ammonium Nitrate (AN 34.5% N)',
         applicationRate: '100 kg/ha',
         pfumvudzaPlotRate: '1 beer bottle cap per plant station',
         estimatedCostUsd: 30.00,
@@ -134,7 +139,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '-10 to 0 DAP',
         task: 'Basin digging at 75cm x 30cm spacing; integrate cattle/goat manure.',
         recommendedInput: 'Compound D or Superphosphate',
-        brandName: 'Windmill Compound D',
+        brandName: 'Compound D (7:14:7) Basal',
         applicationRate: '150 kg/ha',
         pfumvudzaPlotRate: 'Half bottle cap (5g) per station',
         estimatedCostUsd: 25.00,
@@ -145,7 +150,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '0 to 14 DAP',
         task: 'Sow 4-6 seeds thinly; thin out to 2 plants per station at 2 weeks.',
         recommendedInput: 'Certified small grain seed',
-        brandName: 'Seed Co SV-2 / Agriseeds Macia',
+        brandName: 'SV-2 / Macia Certified Small Grain Seed',
         applicationRate: '8 - 10 kg/ha',
         pfumvudzaPlotRate: '600g per plot',
         estimatedCostUsd: 6.00,
@@ -156,7 +161,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '21 to 28 DAP',
         task: 'Keep weed-free during early slow vegetative growth; apply top dressing.',
         recommendedInput: 'Ammonium Nitrate (AN)',
-        brandName: 'ZFC AN',
+        brandName: 'Ammonium Nitrate (AN 34.5% N)',
         applicationRate: '100 kg/ha',
         pfumvudzaPlotRate: '1 level bottle cap per 2 plants',
         estimatedCostUsd: 28.00,
@@ -207,7 +212,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '-7 to 0 DAP',
         task: 'Construct raised ridges or Pfumvudza flat basins at 45cm x 15cm.',
         recommendedInput: 'Single Superphosphate (SSP) + Agricultural Lime',
-        brandName: 'Windmill SSP / Superphosphate',
+        brandName: 'Single Superphosphate (SSP 19% P2O5)',
         applicationRate: '150 kg/ha',
         pfumvudzaPlotRate: '5g SSP per basin station',
         estimatedCostUsd: 22.00,
@@ -218,7 +223,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '0 DAP',
         task: 'Sow unblemished whole kernels treated with rhizobium inoculant.',
         recommendedInput: 'Certified Seed + Grasslands Rhizobium Inoculant',
-        brandName: 'Marondera Grasslands Rhizobium & Seed Co Ilanda',
+        brandName: 'Certified Rhizobium Inoculant & Ilanda Seed',
         applicationRate: '80 - 100 kg/ha',
         pfumvudzaPlotRate: '3 kg seed + 1 sachet inoculant ($1)',
         estimatedCostUsd: 14.00,
@@ -229,7 +234,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '45 to 55 DAP',
         task: 'Broadcast gypsum over flowering crop right as pegs enter the soil.',
         recommendedInput: 'Agricultural Gypsum (Calcium Sulfate)',
-        brandName: 'ZFC Agricultural Gypsum',
+        brandName: 'Agricultural Gypsum (Calcium Sulfate)',
         applicationRate: '200 kg/ha',
         pfumvudzaPlotRate: '15 kg broadcast over plot',
         estimatedCostUsd: 18.00,
@@ -240,7 +245,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '60 to 75 DAP',
         task: 'Scout for early and late Cercospora leaf spot and Rosette-carrying aphids.',
         recommendedInput: 'Copper Oxychloride or Daconil',
-        brandName: 'Agricura Copper Oxychloride 85 WP',
+        brandName: 'Copper Oxychloride 85 WP',
         applicationRate: '2 kg/ha',
         pfumvudzaPlotRate: '30g per 15L knapsack',
         estimatedCostUsd: 5.50,
@@ -291,7 +296,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '0 to 10 DAP',
         task: 'Broadcast lightly in basins; thin to 2 sturdy plants.',
         recommendedInput: 'Certified PMV-3 Seed',
-        brandName: 'Agriseeds / Seed Co PMV-3',
+        brandName: 'PMV-3 Certified Pearl Millet Seed',
         applicationRate: '5 kg/ha',
         pfumvudzaPlotRate: '400g certified seed',
         estimatedCostUsd: 4.50,
@@ -302,7 +307,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '25 to 30 DAP',
         task: 'Apply micro-dose of Ammonium Nitrate.',
         recommendedInput: 'Ammonium Nitrate (AN)',
-        brandName: 'Sable AN',
+        brandName: 'Ammonium Nitrate (AN 34.5% N)',
         applicationRate: '75 kg/ha',
         pfumvudzaPlotRate: 'Half bottle cap per station',
         estimatedCostUsd: 16.00,
@@ -342,7 +347,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '-14 to 0 DAP',
         task: 'Soil testing and liming to raise pH above 5.5.',
         recommendedInput: 'Agricultural Dolomitic Lime',
-        brandName: 'G&W Minerals Dolomitic Lime',
+        brandName: 'Agricultural Dolomitic Lime (CaCO3 + MgCO3)',
         applicationRate: '500 - 1000 kg/ha',
         pfumvudzaPlotRate: '50 kg lime worked into soil',
         estimatedCostUsd: 12.00,
@@ -353,7 +358,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '0 DAP',
         task: 'Inoculate seed with specific Bradyrhizobium japonicum and sow at 45cm x 5cm.',
         recommendedInput: 'Certified Seed + Grasslands Inoculant',
-        brandName: 'Grasslands Soya Inoculant + Seed Co Saga',
+        brandName: 'Bradyrhizobium Soya Inoculant + Saga Certified Seed',
         applicationRate: '80 - 100 kg/ha',
         pfumvudzaPlotRate: '5 kg certified seed + 1 packet inoculant',
         estimatedCostUsd: 15.00,
@@ -364,7 +369,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '0 DAP',
         task: 'Place basal fertilizer 5cm away and 5cm below seed furrow.',
         recommendedInput: 'Compound S or Single Superphosphate',
-        brandName: 'Windmill Compound S (Soyabean Special)',
+        brandName: 'Compound S (7:21:8 + 9S + 0.1B)',
         applicationRate: '200 kg/ha',
         pfumvudzaPlotRate: '12 kg per plot',
         estimatedCostUsd: 26.00,
@@ -375,7 +380,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '55 to 70 DAP',
         task: 'Scout for Asian Soybean Rust (Phakopsora pachyrhizi) during flowering/podding.',
         recommendedInput: 'Triazole fungicide',
-        brandName: 'Agricura Folicur or Punch Xtra',
+        brandName: 'Folicur or Punch Xtra',
         applicationRate: '500 ml/ha',
         pfumvudzaPlotRate: '35 ml per 15L knapsack',
         estimatedCostUsd: 8.50,
@@ -415,7 +420,7 @@ export const MASTER_CROPS: CropRecommendation[] = [
         timingDap: '-5 to 0 DAP',
         task: 'Construct ridges at 60cm apart.',
         recommendedInput: 'Single Superphosphate (SSP)',
-        brandName: 'Windmill SSP',
+        brandName: 'Single Superphosphate (SSP)',
         applicationRate: '100 kg/ha',
         pfumvudzaPlotRate: '6 kg plot application',
         estimatedCostUsd: 14.00,
@@ -458,6 +463,11 @@ export const MASTER_CROPS: CropRecommendation[] = [
   },
 ];
 
+export const MASTER_CROPS: CropRecommendation[] = [
+  ...BASE_CROPS,
+  ...ALL_EXPANDED_CROPS
+];
+
 export interface LivestockGuide {
   type: 'Cattle' | 'Goat' | 'Poultry';
   name: string;
@@ -492,7 +502,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'Weekly (Wet Season Nov-Apr)',
           action: 'Compulsory Plunge Dipping against Ticks (Theileriosis / January Disease prevention)',
           product: 'Deltamethrin / Amitraz cattle dip',
-          brand: 'Decatix / Triatix / Cooper Dip',
+          brand: 'Decatix / Triatix (Deltamethrin/Amitraz Dip)',
           dosageCostUsd: '$0.50 per head / month at communal dip tank',
           importance: 'Vital: Missing one dip during wet season causes lethal January disease outbreaks.',
         },
@@ -500,7 +510,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'October (Pre-Rain Season)',
           action: 'Annual Clostridial and Anthrax Vaccination',
           product: 'Anthrax + Blackquarter (Quarter Evil) Vaccine',
-          brand: 'National Vet Lab / Onderstepoort Biologicals',
+          brand: 'Anthrax & Blackleg Livestock Vaccine',
           dosageCostUsd: '$1.80 per dose per animal',
           importance: 'Prevents sudden deaths triggered by soil bacteria churning up after first rains.',
         },
@@ -508,7 +518,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'May - September (Dry Season)',
           action: 'Winter Protein Lick Supplementation',
           product: 'Urea-based high protein winter lick block',
-          brand: 'National Foods Super Winter Lick / Agrifoods',
+          brand: 'High-Protein Winter Maintenance Mineral Lick',
           dosageCostUsd: '$18.00 per 50kg block (feeds 10 cows for 2 weeks)',
           importance: 'Maintains rumen microbial activity on dry sour veld; prevents catastrophic winter weight crash.',
         },
@@ -516,7 +526,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'Bi-annual (Post-Weaning)',
           action: 'Broad Spectrum Deworming (Liver fluke & roundworms)',
           product: 'Albendazole 10% or Levamisole drench',
-          brand: 'Agricura Valbazen / Terramycin LA',
+          brand: 'Valbazen / Terramycin LA',
           dosageCostUsd: '$1.20 per animal',
           importance: 'Improves body condition score from 2 to 3.5 prior to breeding season.',
         },
@@ -526,7 +536,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'Weekly (Wet Season Nov-Apr)',
           action: 'Compulsory Plunge Dipping against Ticks (Theileriosis / January Disease prevention)',
           product: 'Deltamethrin / Amitraz cattle dip',
-          brand: 'Decatix / Triatix / Cooper Dip',
+          brand: 'Decatix / Triatix (Deltamethrin/Amitraz Dip)',
           dosageCostUsd: '$0.50 per head / month at communal dip tank',
           importance: 'Vital: Missing one dip during wet season causes lethal January disease outbreaks.',
         },
@@ -534,7 +544,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'October (Pre-Rain Season)',
           action: 'Annual Clostridial and Anthrax Vaccination',
           product: 'Anthrax + Blackquarter (Quarter Evil) Vaccine',
-          brand: 'National Vet Lab / Onderstepoort Biologicals',
+          brand: 'Anthrax & Blackleg Livestock Vaccine',
           dosageCostUsd: '$1.80 per dose per animal',
           importance: 'Prevents sudden deaths triggered by soil bacteria churning up after first rains.',
         },
@@ -542,7 +552,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'May - September (Dry Season)',
           action: 'Winter Protein Lick Supplementation',
           product: 'Urea-based high protein winter lick block',
-          brand: 'National Foods Super Winter Lick / Agrifoods',
+          brand: 'High-Protein Winter Maintenance Mineral Lick',
           dosageCostUsd: '$18.00 per 50kg block (feeds 10 cows for 2 weeks)',
           importance: 'Maintains rumen microbial activity on dry sour veld; prevents catastrophic winter weight crash.',
         },
@@ -550,7 +560,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'Bi-annual (Post-Weaning)',
           action: 'Broad Spectrum Deworming (Liver fluke & roundworms)',
           product: 'Albendazole 10% or Levamisole drench',
-          brand: 'Agricura Valbazen / Terramycin LA',
+          brand: 'Valbazen / Terramycin LA',
           dosageCostUsd: '$1.20 per animal',
           importance: 'Improves body condition score from 2 to 3.5 prior to breeding season.',
         },
@@ -560,7 +570,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'Weekly (Wet Season Nov-Apr)',
           action: 'Compulsory Plunge Dipping against Ticks (Theileriosis / January Disease prevention)',
           product: 'Deltamethrin / Amitraz cattle dip',
-          brand: 'Decatix / Triatix / Cooper Dip',
+          brand: 'Decatix / Triatix (Deltamethrin/Amitraz Dip)',
           dosageCostUsd: '$0.50 per head / month at communal dip tank',
           importance: 'Vital: Missing one dip during wet season causes lethal January disease outbreaks.',
         },
@@ -568,7 +578,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'October (Pre-Rain Season)',
           action: 'Annual Clostridial and Anthrax Vaccination',
           product: 'Anthrax + Blackquarter (Quarter Evil) Vaccine',
-          brand: 'National Vet Lab / Onderstepoort Biologicals',
+          brand: 'Anthrax & Blackleg Livestock Vaccine',
           dosageCostUsd: '$1.80 per dose per animal',
           importance: 'Prevents sudden deaths triggered by soil bacteria churning up after first rains.',
         },
@@ -576,7 +586,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'May - September (Dry Season)',
           action: 'Winter Protein Lick Supplementation',
           product: 'Urea-based high protein winter lick block',
-          brand: 'National Foods Super Winter Lick / Agrifoods',
+          brand: 'High-Protein Winter Maintenance Mineral Lick',
           dosageCostUsd: '$18.00 per 50kg block (feeds 10 cows for 2 weeks)',
           importance: 'Maintains rumen microbial activity on dry sour veld; prevents catastrophic winter weight crash.',
         },
@@ -584,7 +594,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'Bi-annual (Post-Weaning)',
           action: 'Broad Spectrum Deworming (Liver fluke & roundworms)',
           product: 'Albendazole 10% or Levamisole drench',
-          brand: 'Agricura Valbazen / Terramycin LA',
+          brand: 'Valbazen / Terramycin LA',
           dosageCostUsd: '$1.20 per animal',
           importance: 'Improves body condition score from 2 to 3.5 prior to breeding season.',
         },
@@ -594,7 +604,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'Weekly (Wet Season Nov-Apr)',
           action: 'Compulsory Plunge Dipping against Ticks (Theileriosis / January Disease prevention)',
           product: 'Deltamethrin / Amitraz cattle dip',
-          brand: 'Decatix / Triatix / Cooper Dip',
+          brand: 'Decatix / Triatix (Deltamethrin/Amitraz Dip)',
           dosageCostUsd: '$0.50 per head / month at communal dip tank',
           importance: 'Vital: Missing one dip during wet season causes lethal January disease outbreaks.',
         },
@@ -602,7 +612,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'October (Pre-Rain Season)',
           action: 'Annual Clostridial and Anthrax Vaccination',
           product: 'Anthrax + Blackquarter (Quarter Evil) Vaccine',
-          brand: 'National Vet Lab / Onderstepoort Biologicals',
+          brand: 'Anthrax & Blackleg Livestock Vaccine',
           dosageCostUsd: '$1.80 per dose per animal',
           importance: 'Prevents sudden deaths triggered by soil bacteria churning up after first rains.',
         },
@@ -610,7 +620,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'May - September (Dry Season)',
           action: 'Winter Protein Lick Supplementation',
           product: 'Urea-based high protein winter lick block',
-          brand: 'National Foods Super Winter Lick / Agrifoods',
+          brand: 'High-Protein Winter Maintenance Mineral Lick',
           dosageCostUsd: '$18.00 per 50kg block (feeds 10 cows for 2 weeks)',
           importance: 'Maintains rumen microbial activity on dry sour veld; prevents catastrophic winter weight crash.',
         },
@@ -618,7 +628,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
           period: 'Bi-annual (Post-Weaning)',
           action: 'Broad Spectrum Deworming (Liver fluke & roundworms)',
           product: 'Albendazole 10% or Levamisole drench',
-          brand: 'Agricura Valbazen / Terramycin LA',
+          brand: 'Valbazen / Terramycin LA',
           dosageCostUsd: '$1.20 per animal',
           importance: 'Improves body condition score from 2 to 3.5 prior to breeding season.',
         },
@@ -641,7 +651,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
         period: 'Monthly (All Year)',
         action: 'Foot Bath & Hoof Trimming against Foot Rot',
         product: 'Copper Sulphate 5% solution foot bath',
-        brand: 'ZFC Copper Sulphate Crystals',
+        brand: 'Copper Sulphate Footbath Crystals',
         dosageCostUsd: '$4.00 per 1kg bag treats 50 goats',
         importance: 'Foot rot during wet rainy months disables grazing ability and leads to severe wasting.',
       },
@@ -649,7 +659,7 @@ export const LIVESTOCK_GUIDES: LivestockGuide[] = [
         period: 'At Kidding (Birth)',
         action: 'Navel Disinfection & Pulpy Kidney Vaccine',
         product: 'Tincture of Iodine + Clostridial vaccine',
-        brand: 'Betadine Spray / Enterotoxaemia vaccine',
+        brand: 'Povidone Iodine Spray / Enterotoxaemia Vaccine',
         dosageCostUsd: '$0.30 per kid',
         importance: 'Eliminates joint ill and sudden deaths in rapidly growing kids.',
       },

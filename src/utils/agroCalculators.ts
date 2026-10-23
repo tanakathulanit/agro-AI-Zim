@@ -86,11 +86,11 @@ export function calculatePredictedYield(input: YieldPredictionInput): YieldPredi
   if (waterPenaltyPct > 30) {
     advisory = `Critical water stress detected (${input.rainfallReceivedMm}mm vs ${reqMin}mm needed). Deep mulching and Pfumvudza potholing are vital to hold moisture.`;
   } else if (pestPenaltyPct > 25) {
-    advisory = `Pest pressure is severely depleting yield potential by -${pestPenaltyPct}%. Immediate application of registered Agricura Karate Zeon or wood ash is urgent.`;
+    advisory = `Pest pressure is severely depleting yield potential by -${pestPenaltyPct}%. Immediate application of registered Karate Zeon or wood ash is urgent.`;
   } else if (nutrientPenaltyPct > 20) {
     advisory = `Crop is nitrogen hungry. Adding split top-dressing (Ammonium Nitrate) while soil is damp can restore 1.5 to 2.5 tonnes/ha.`;
   } else {
-    advisory = `Favorable conditions! Maintaining weed-free basins and routine scouting will lock in high Hurudza master farmer yields.`;
+    advisory = `Favorable conditions! Maintaining weed-free basins and routine scouting will lock in high master farmer yields.`;
   }
 
   return {
@@ -132,7 +132,7 @@ export interface PostHarvestResult {
   profitPerBagUsd: number;
   breakEvenYieldBags: number;
   nitrogenUseEfficiencyKgPerKg: number; // kg grain per kg N
-  efficiencyGrade: 'A+ Master Farmer (Hurudza)' | 'B Profitable' | 'C Marginal' | 'D Loss Making';
+  efficiencyGrade: 'A+ Master Farmer' | 'B Profitable' | 'C Marginal' | 'D Loss Making';
   efficiencyAdvice: string;
 }
 
@@ -171,15 +171,15 @@ export function analyzePostHarvestPerformance(input: PostHarvestInputAnalysis, u
     ? Number((totalGrainKg / input.appliedNitrogenKg).toFixed(1))
     : 0;
 
-  let efficiencyGrade: 'A+ Master Farmer (Hurudza)' | 'B Profitable' | 'C Marginal' | 'D Loss Making' = 'B Profitable';
+  let efficiencyGrade: 'A+ Master Farmer' | 'B Profitable' | 'C Marginal' | 'D Loss Making' = 'B Profitable';
   let efficiencyAdvice = '';
 
   if (returnOnInvestmentPct >= 110 && costPerBagUsd <= 7.50) {
-    efficiencyGrade = 'A+ Master Farmer (Hurudza)';
+    efficiencyGrade = 'A+ Master Farmer';
     efficiencyAdvice = `Outstanding performance! Your production cost of $${costPerBagUsd}/bag is well below the national commercial average of $9.20. Your Nitrogen Use Efficiency of ${nitrogenUseEfficiencyKgPerKg} kg grain/kg N indicates exceptional Pfumvudza placement.`;
   } else if (returnOnInvestmentPct >= 40) {
     efficiencyGrade = 'B Profitable';
-    efficiencyAdvice = `Solid return of ${returnOnInvestmentPct}%. To push toward Hurudza level, optimize top-dressing split timing and integrate more kraal manure to shave $15-$20 off synthetic fertilizer bills.`;
+    efficiencyAdvice = `Solid return of ${returnOnInvestmentPct}%. To push toward top master farmer level, optimize top-dressing split timing and integrate more kraal manure to shave $15-$20 off synthetic fertilizer bills.`;
   } else if (returnOnInvestmentPct >= 0) {
     efficiencyGrade = 'C Marginal';
     efficiencyAdvice = `Marginal margin ($${netGrossMarginUsd}). High input costs eroded margins. Consider bulk collective buying through your local farmer group (Nhimbe/Pfumvudza club) to secure agrochemical discounts.`;

@@ -13,14 +13,15 @@ import { ZimbabweLocation } from '../data/zimbabweLocations';
 
 interface Props {
   currentLocation: ZimbabweLocation;
+  farmerProfileContext?: string;
 }
 
-export const AgritexAssistant: React.FC<Props> = ({ currentLocation }) => {
+export const AgritexAssistant: React.FC<Props> = ({ currentLocation, farmerProfileContext }) => {
   const [question, setQuestion] = useState<string>('');
   const [conversation, setConversation] = useState<Array<{ role: 'user' | 'assistant'; text: string }>>([
     {
       role: 'assistant',
-      text: `Mhoroi / Salibonani! I am your **Hurudza Smart Agro-Advisor**. I specialize in Zimbabwe smallholder agriculture, Pfumvudza conservation practices, Agritex input standards, and pest solutions across Natural Regions I to V. Ask me anything about your farm in ${currentLocation.name}.`,
+      text: `Mhoroi / Salibonani! I am your **Farmers Dictionary Zw Smart Agro-Advisor**. I specialize in Zimbabwe smallholder agriculture, Pfumvudza conservation practices, Agritex input standards, and pest solutions across Natural Regions I to V.${farmerProfileContext ? `\n\n🌾 *Active Farm Profile Linked:* ${farmerProfileContext}` : ''} Ask me anything about your farm in ${currentLocation.name}.`,
     },
   ]);
   const [isAsking, setIsAsking] = useState<boolean>(false);
@@ -53,6 +54,7 @@ export const AgritexAssistant: React.FC<Props> = ({ currentLocation }) => {
             annualRainfall: currentLocation.annualRainfallAvgMm,
             dominantSoil: currentLocation.dominantSoil,
             soilPh: currentLocation.soilPh,
+            farmerProfile: farmerProfileContext || undefined,
           },
         }),
       });
@@ -68,7 +70,7 @@ export const AgritexAssistant: React.FC<Props> = ({ currentLocation }) => {
         ...prev,
         {
           role: 'assistant',
-          text: `**Hurudza Advisory Protocol:** For ${currentLocation.name} (Region ${currentLocation.naturalRegion}), ensure Pfumvudza basins receive minimum 25mm planting rain before sowing. Apply Compound D basal covered by 2cm soil, and scout weekly for Fall Armyworm using Agricura Karate Zeon or wood ash.`,
+          text: `**Agritex Advisory Protocol:** For ${currentLocation.name} (Region ${currentLocation.naturalRegion}), ensure Pfumvudza basins receive minimum 25mm planting rain before sowing. Apply Compound D basal covered by 2cm soil, and scout weekly for Fall Armyworm using Karate Zeon or wood ash.`,
         },
       ]);
     } finally {
@@ -85,7 +87,7 @@ export const AgritexAssistant: React.FC<Props> = ({ currentLocation }) => {
             <Bot className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="font-bold text-sm text-white">Hurudza Agritex Advisor</h4>
+            <h4 className="font-bold text-sm text-white">Farmers Dictionary Zw Advisor</h4>
             <span className="text-[10px] text-emerald-300">
               Context: {currentLocation.name} • Natural Region {currentLocation.naturalRegion}
             </span>
@@ -95,6 +97,13 @@ export const AgritexAssistant: React.FC<Props> = ({ currentLocation }) => {
           AI Agronomist Active
         </span>
       </div>
+
+      {farmerProfileContext && (
+        <div className="bg-emerald-900/90 text-emerald-100 px-4 py-1.5 text-[10.5px] flex items-center justify-between border-b border-emerald-800 font-medium">
+          <span className="truncate">🧑‍🌾 Linked Farm Profile: {farmerProfileContext}</span>
+          <span className="text-[10px] font-black text-amber-300 bg-amber-900/60 px-2 py-0.5 rounded-full shrink-0">Personalized</span>
+        </div>
+      )}
 
       {/* Suggested Prompt Chips */}
       <div className="p-3 bg-slate-50 border-b border-slate-100 flex items-center gap-1.5 overflow-x-auto text-[11px]">

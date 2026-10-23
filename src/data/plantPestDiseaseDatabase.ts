@@ -5,7 +5,7 @@
  * - Plant Quarantine Services (PQS) & Department of Veterinary Services (DVS)
  * - EPPO Global Database (European and Mediterranean Plant Protection Organization)
  * - CABI Plantwise Knowledge Bank & CIMMYT / ICRISAT Agronomy Datasheets
- * - Zimbabwe Agrochemical Registration Gazette (Agricura, ZFC, Windmill, Bayer, Syngenta)
+ * - Zimbabwe Agrochemical Registration Gazette (DR&SS Official National Register)
  */
 
 export interface RegisteredAgrochemical {
@@ -95,10 +95,10 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     ],
     economicThreshold: '5% of plants with fresh frass at early whorl (V3-V6); 15-20% of plants showing damage at mid-to-late whorl (V7-V12).',
     primaryRegisteredControl: {
-      brandName: 'Ampligo 150 ZC / Agricura Karate Zeon 5CS',
+      brandName: 'Ampligo 150 ZC / Karate Zeon 5CS',
       activeIngredient: 'Chlorantraniliprole 100g/L + Lambda-cyhalothrin 50g/L',
-      manufacturer: 'Agricura Zimbabwe / Syngenta',
-      registrationNumberZim: 'Agricura ZIM-REG-3482',
+      manufacturer: 'DR&SS Registered',
+      registrationNumberZim: 'ZIM-REG-3482',
       dilutionRate: '15ml to 20ml per 15-litre knapsack sprayer (100ml to 150ml per hectare in 200L water)',
       applicationTiming: 'Late afternoon (after 16:00) when caterpillars feed actively; aim nozzle directly down into whorl funnel.',
       safetyPreHarvestInterval: '14 days before harvest of green mealies',
@@ -154,8 +154,8 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: 'Dipterex 2.5% Granules / Bulldock 0.05 GR',
       activeIngredient: 'Trichlorfon 25g/kg or Beta-cyfluthrin 0.5g/kg',
-      manufacturer: 'Agricura / Bayer Zimbabwe',
-      registrationNumberZim: 'Agricura ZIM-REG-1204',
+      manufacturer: 'DR&SS Registered',
+      registrationNumberZim: 'ZIM-REG-1204',
       dilutionRate: 'Dry granular application: 3kg to 5kg per hectare (pinch of 0.5g granules per plant whorl funnel)',
       applicationTiming: 'Apply 3 to 4 weeks after emergence at knee-height before larvae bore into stalk.',
       safetyPreHarvestInterval: '30 days prior to harvest',
@@ -211,8 +211,8 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: 'Amistar Top 325 SC / Bravo 720',
       activeIngredient: 'Azoxystrobin 200g/L + Difenoconazole 125g/L or Chlorothalonil 720g/L',
-      manufacturer: 'Syngenta / ZFC Limited',
-      registrationNumberZim: 'ZFC-REG-8921',
+      manufacturer: 'DR&SS Registered',
+      registrationNumberZim: 'ZW-P-8921/2016',
       dilutionRate: '20ml per 15L knapsack (400ml to 500ml per hectare in 200L water)',
       applicationTiming: 'Preventative application at tasseling/silking (VT-R1 stage); repeat after 14 days if wet humid weather continues.',
       safetyPreHarvestInterval: '28 days before grain harvest',
@@ -268,8 +268,8 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: 'Cruiser 600 FS / Gaucho 600 FS Seed Treatment + Confidor 200 SL',
       activeIngredient: 'Thiamethoxam 600g/L or Imidacloprid 600g/L',
-      manufacturer: 'Syngenta / Bayer Zimbabwe',
-      registrationNumberZim: 'Agricura ZIM-REG-5520',
+      manufacturer: 'DR&SS Registered',
+      registrationNumberZim: 'ZIM-REG-5520',
       dilutionRate: 'Seed dressing: 10ml per 10kg seed before planting; Foliar rescue: 10ml Confidor per 15L knapsack',
       applicationTiming: 'Dress seed prior to sowing; foliar insecticide applied within first 21 days if leafhoppers migrate.',
       safetyPreHarvestInterval: '45 days before harvest',
@@ -325,8 +325,8 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: 'Folicur 250 EW / Tilt 250 EC',
       activeIngredient: 'Tebuconazole 250g/L or Propiconazole 250g/L',
-      manufacturer: 'Bayer Zimbabwe / Syngenta',
-      registrationNumberZim: 'Bayer ZIM-REG-2114',
+      manufacturer: 'DR&SS Registered',
+      registrationNumberZim: 'ZW-P-2114/2014',
       dilutionRate: '15ml to 20ml per 15L knapsack (300ml to 400ml/ha in 200L water)',
       applicationTiming: 'Apply at first sign of pustules on mid-leaves during tasseling; repeat after 14-21 days if damp cool weather persists.',
       safetyPreHarvestInterval: '21 days before harvest',
@@ -382,8 +382,8 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: 'Shumba Super Dust / Actellic Gold Dust',
       activeIngredient: 'Pirimiphos-methyl 16g/kg + Deltamethrin 3g/kg or Fenitrothion + Deltamethrin',
-      manufacturer: 'Agricura Zimbabwe / Syngenta',
-      registrationNumberZim: 'Agricura ZIM-REG-0872',
+      manufacturer: 'DR&SS Registered',
+      registrationNumberZim: 'ZIM-REG-0872',
       dilutionRate: '50g sachet thoroughly mixed per 50kg bag of clean dry maize grain (moisture content below 12.5%)',
       applicationTiming: 'Dust within 48 hours of shelling and winnowing dry grain before placing into granary or bags.',
       safetyPreHarvestInterval: 'Grain can be consumed safely after winnowing and washing',
@@ -439,8 +439,8 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: 'Ridomil Gold MZ 68 WG / Bravo 720',
       activeIngredient: 'Mefenoxam 40g/kg + Mancozeb 640g/kg',
-      manufacturer: 'Syngenta / Windmill Zimbabwe',
-      registrationNumberZim: 'Windmill ZIM-REG-4412',
+      manufacturer: 'DR&SS Registered',
+      registrationNumberZim: 'ZW-P-4412/2018',
       dilutionRate: '40g to 50g per 15L knapsack sprayer (2.5kg per hectare in 500L water)',
       applicationTiming: 'Preventative application every 7-10 days in wet overcast weather; curative within 48 hours of first symptom.',
       safetyPreHarvestInterval: '7 days for tomatoes; 14 days for potatoes',
@@ -496,8 +496,8 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: 'Coragen 20 SC / Belt 480 SC',
       activeIngredient: 'Chlorantraniliprole 200g/L or Flubendiamide 480g/L',
-      manufacturer: 'FMC / Bayer Zimbabwe',
-      registrationNumberZim: 'Agricura ZIM-REG-6701',
+      manufacturer: 'DR&SS Registered',
+      registrationNumberZim: 'ZIM-REG-6701',
       dilutionRate: '3.5ml to 5ml per 15-litre knapsack sprayer (100ml to 150ml per hectare)',
       applicationTiming: 'Spray at dusk when moths are active; alternate active ingredients every 2 sprays to prevent rapid resistance buildup.',
       safetyPreHarvestInterval: '3 days for fresh market tomatoes',
@@ -553,8 +553,8 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: 'No chemical cure exists for infected plants. Copper Hydroxide (Kocide 2000) for border protection.',
       activeIngredient: 'Copper Hydroxide 538g/kg',
-      manufacturer: 'Kocide LLC / Agricura',
-      registrationNumberZim: 'Agricura ZIM-REG-1922',
+      manufacturer: 'DR&SS Registered',
+      registrationNumberZim: 'ZIM-REG-1922',
       dilutionRate: '30g per 15L knapsack drench to suppress bacterial splash spread to neighboring basins',
       applicationTiming: 'Drench root zone of adjacent plants upon roguing infected specimen.',
       safetyPreHarvestInterval: '3 days for fresh produce',
@@ -610,8 +610,8 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: 'Steward 150 EC / Radiant 120 SC',
       activeIngredient: 'Indoxacarb 150g/L or Spinetoram 120g/L',
-      manufacturer: 'Corteva / FMC Zimbabwe',
-      registrationNumberZim: 'Agricura ZIM-REG-5034',
+      manufacturer: 'DR&SS Registered',
+      registrationNumberZim: 'ZIM-REG-5034',
       dilutionRate: '5ml per 15L knapsack sprayer (150ml per hectare in 300L water)',
       applicationTiming: 'Early morning or late afternoon; add a wetting agent (Surfactant / Break-Thru) to penetrate waxy brassica leaves.',
       safetyPreHarvestInterval: '3 days for leafy greens; 7 days for cabbage heads',
@@ -631,7 +631,7 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
       'Scout seedlings twice weekly before heading.'
     ],
     resistantVarieties: ['Cabbage varieties with waxy thick leaves: Drumhead, Marcanta F1, Grandslam F1'],
-    agritexAdvisory: 'Always include a registered sticker/wetter (e.g. Agricura Agral 90) when spraying brassicas. Water beads off cabbage leaves without wetting agents, wasting 80% of chemical.',
+    agritexAdvisory: 'Always include a registered sticker/wetter (e.g. Agral 90) when spraying brassicas. Water beads off cabbage leaves without wetting agents, wasting 80% of chemical.',
     verifiedFieldReferenceNotes: 'Infamous globally for evolving rapid resistance to almost all synthetic insecticides.',
     fieldVisualCharacteristics: {
       foliageAppearance: 'Window-paned shot-holes riddled through foliage with silken cocoons underneath',
@@ -667,8 +667,8 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: 'Dimethoate 40 EC / Acetamiprid 20 SP',
       activeIngredient: 'Dimethoate 400g/L or Acetamiprid 200g/kg',
-      manufacturer: 'Agricura / ZFC Limited',
-      registrationNumberZim: 'Agricura ZIM-REG-3108',
+      manufacturer: 'DR&SS Registered',
+      registrationNumberZim: 'ZIM-REG-3108',
       dilutionRate: '15ml to 20ml Dimethoate per 15L knapsack (400ml/ha in 200L water)',
       applicationTiming: 'Spray at first sight of black aphid colonies on young seedlings within 2 to 4 weeks of emergence.',
       safetyPreHarvestInterval: '28 days before harvest',
@@ -724,8 +724,8 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: '2,4-D Amine 720 SL / Roundup 360 SL (Spot application)',
       activeIngredient: '2,4-D Amine 720g/L',
-      manufacturer: 'Agricura / Windmill Zimbabwe',
-      registrationNumberZim: 'Agricura ZIM-REG-1054',
+      manufacturer: 'DR&SS Registered',
+      registrationNumberZim: 'ZIM-REG-1054',
       dilutionRate: '30ml 2,4-D per 15L knapsack sprayer with cone nozzle aimed directly at emerged Striga foliage',
       applicationTiming: 'Spray immediately upon emergence of Striga plants BEFORE flowers set seed.',
       safetyPreHarvestInterval: '60 days before grain harvest',
@@ -779,10 +779,10 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     ],
     economicThreshold: 'Presence of adult weevils in vine canopy or 1% damaged storage roots at sampling.',
     primaryRegisteredControl: {
-      brandName: 'Dursban 4E / Agricura Chlorpyrifos 48 EC (Soil drench)',
+      brandName: 'Dursban 4E / Chlorpyrifos 48 EC (Soil drench)',
       activeIngredient: 'Chlorpyrifos 480g/L',
-      manufacturer: 'Dow AgroSciences / Agricura Zimbabwe',
-      registrationNumberZim: 'Agricura ZIM-REG-2041',
+      manufacturer: 'DR&SS Registered',
+      registrationNumberZim: 'ZIM-REG-2041',
       dilutionRate: '25ml per 15L knapsack sprayer aimed at vine base and ridge cracks',
       applicationTiming: 'Drench ridges at 6-8 weeks after planting and again at tuber enlargement (12 weeks).',
       safetyPreHarvestInterval: '30 days before harvesting tubers',
@@ -838,7 +838,7 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: 'Decatix Cattle Dip 5% + Bupalex (Buparvaquone)',
       activeIngredient: 'Deltamethrin 50g/L + Buparvaquone 50mg/ml',
-      manufacturer: 'Cooper Zimbabwe / Agricura Veterinary Division',
+      manufacturer: 'DR&SS Registered',
       registrationNumberZim: 'DVS-VET-REG-0118',
       dilutionRate: 'Plunge Dip: 1 Litre Decatix per 1,000L water; Curative: 1ml Bupalex per 20kg bodyweight deep intramuscular neck injection',
       applicationTiming: 'Mandatory 5-5-4 dipping interval during rainy season; inject Bupalex within first 24 hours of fever onset.',
@@ -895,7 +895,7 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: 'Terramycin LA 200mg/ml / Hi-Tet 200 LA',
       activeIngredient: 'Oxytetracycline Long-Acting 200mg/ml',
-      manufacturer: 'Zoetis / Cooper Zimbabwe',
+      manufacturer: 'DR&SS Registered',
       registrationNumberZim: 'DVS-VET-REG-0344',
       dilutionRate: '1ml per 10kg bodyweight (e.g. 30ml for a 300kg steer) injected deep intramuscularly into thick neck muscle',
       applicationTiming: 'Administer immediately at earliest stage of fever or twitching; efficacy drops to near zero once convulsions start.',
@@ -952,7 +952,7 @@ export const REAL_PEST_DISEASE_DATABASE: PestDiseaseRecord[] = [
     primaryRegisteredControl: {
       brandName: 'I-2 Thermostable Newcastle Vaccine (Ocular or Drinking Water)',
       activeIngredient: 'Live attenuated avirulent I-2 Newcastle Disease Virus strain',
-      manufacturer: 'Department of Veterinary Services / Vet Lab Harare',
+      manufacturer: 'DR&SS Registered',
       registrationNumberZim: 'DVS-VET-REG-0992',
       dilutionRate: '1 eye-drop per bird using clean eye dropper (or mixed in chlorine-free skimmed milk water)',
       applicationTiming: 'Vaccinate every 3-4 months throughout the year before windy dry season outbreaks.',

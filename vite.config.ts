@@ -14,8 +14,8 @@ export default defineConfig(() => {
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg'],
         manifest: {
           id: '/',
-          name: 'Hurudza - Zimbabwe Smart Agro-Advisory',
-          short_name: 'HurudzaAgro',
+          name: 'Farmers Dictionary Zw - Zimbabwe Smart Agro-Advisory',
+          short_name: 'FarmersDict',
           description: 'Real-time agro-advisory system for Zimbabwe smallholder farmers featuring hyper-local weather stations, offline diagnostics, and market price discovery.',
           theme_color: '#064e3b',
           background_color: '#f8fafc',

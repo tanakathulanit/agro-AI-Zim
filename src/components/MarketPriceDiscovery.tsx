@@ -60,7 +60,7 @@ export const MarketPriceDiscovery: React.FC<Props> = ({ currentLocationName }) =
       if (data.success && data.data) {
         setMarketData(data.data);
         try {
-          localStorage.setItem('hurudza_cached_market_prices', JSON.stringify(data.data));
+          localStorage.setItem('farmers_cached_market_prices', JSON.stringify(data.data));
         } catch (e) {
           console.warn('Cache write error:', e);
         }
@@ -68,7 +68,7 @@ export const MarketPriceDiscovery: React.FC<Props> = ({ currentLocationName }) =
     } catch (err) {
       console.warn('Network unavailable, attempting offline cache:', err);
       try {
-        const cached = localStorage.getItem('hurudza_cached_market_prices');
+        const cached = localStorage.getItem('farmers_cached_market_prices');
         if (cached) {
           setMarketData(JSON.parse(cached));
         }

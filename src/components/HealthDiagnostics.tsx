@@ -20,7 +20,9 @@ import {
   Award,
   ChevronRight,
   X,
-  Info
+  Info,
+  Flame,
+  MapPin
 } from 'lucide-react';
 
 import { 
@@ -35,6 +37,11 @@ import {
   PRE_DOWNLOADED_AGROCHEMICAL_DB, 
   saveToOfflineOutbox 
 } from '../utils/offlineStorage';
+import { REGISTERED_ZIMBABWE_CHEMICALS } from '../data/registeredChemicalsDatabase';
+
+import { CommunityOutbreakHeatMapView } from './CommunityOutbreakHeatMapView';
+import { ZimbabweLocation, ZIMBABWE_LOCATIONS } from '../data/zimbabweLocations';
+import { getCommunityOutbreaks, calculateDistanceKm } from '../data/communityOutbreakData';
 
 export interface DiagnosticResult {
   diagnosis: string;
@@ -65,15 +72,34 @@ export interface DiagnosticResult {
 
 interface Props {
   currentLocationName: string;
+  selectedLocation?: ZimbabweLocation;
   isOfflineMode?: boolean;
 }
 
 export const HealthDiagnostics: React.FC<Props> = ({ 
   currentLocationName,
+  selectedLocation,
   isOfflineMode = false 
 }) => {
   // Navigation tabs inside Health & Diagnostics
-  const [activeView, setActiveView] = useState<'scanner' | 'database' | 'chemicals'>('scanner');
+  const [activeView, setActiveView] = useState<'scanner' | 'database' | 'chemicals' | 'outbreaks'>('scanner');
+
+  // Nearby community outbreaks telemetry for farmer's location
+  const farmerCoords = useMemo(() => {
+    if (selectedLocation?.coordinates) return selectedLocation.coordinates;
+    const found = ZIMBABWE_LOCATIONS.find(loc => 
+      currentLocationName.toLowerCase().includes(loc.name.toLowerCase()) ||
+      currentLocationName.toLowerCase().includes(loc.district.toLowerCase())
+    );
+    return found?.coordinates || { lat: -17.82, lng: 31.33 };
+  }, [selectedLocation, currentLocationName]);
+
+  const nearbyOutbreaksCount = useMemo(() => {
+    const list = getCommunityOutbreaks();
+    return list.filter(r => 
+      calculateDistanceKm(farmerCoords.lat, farmerCoords.lng, r.coordinates.lat, r.coordinates.lng) <= 50
+    ).length;
+  }, [farmerCoords]);
 
   // Scanner state
   const [targetType, setTargetType] = useState<'plant' | 'livestock'>('plant');
@@ -299,7 +325,7 @@ export const HealthDiagnostics: React.FC<Props> = ({
             </p>
           </div>
 
-          {/* Sub-Tabs: Scanner vs Database Explorer vs Agrochemical Register */}
+          {/* Sub-Tabs: Scanner vs Database Explorer vs Agrochemical Register vs Community Outbreak Heat Map */}
           <div className="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1 rounded-xl self-start lg:self-center">
             <button
               onClick={() => setActiveView('scanner')}
@@ -311,6 +337,23 @@ export const HealthDiagnostics: React.FC<Props> = ({
             >
               <Camera className="w-3.5 h-3.5 text-emerald-600" />
               Field Camera Scanner
+            </button>
+
+            <button
+              onClick={() => setActiveView('outbreaks')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                activeView === 'outbreaks'
+                  ? 'bg-red-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Flame className={`w-3.5 h-3.5 ${activeView === 'outbreaks' ? 'text-white' : 'text-red-600'}`} />
+              <span>Outbreak Heat Map</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-extrabold ${
+                activeView === 'outbreaks' ? 'bg-red-700 text-white' : 'bg-red-100 text-red-800'
+              }`}>
+                {nearbyOutbreaksCount} Nearby
+              </span>
             </button>
 
             <button
@@ -342,7 +385,39 @@ export const HealthDiagnostics: React.FC<Props> = ({
 
       {/* VIEW 1: FIELD CAMERA & DIAGNOSTIC SCANNER */}
       {activeView === 'scanner' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="space-y-4">
+          {/* Real Community Outbreak Alert Banner for Current Location */}
+          {nearbyOutbreaksCount > 0 && (
+            <div 
+              onClick={() => setActiveView('outbreaks')}
+              className="cursor-pointer bg-gradient-to-r from-red-950 via-slate-900 to-amber-950 text-white p-3.5 rounded-2xl border border-red-800/80 shadow-sm flex items-center justify-between transition hover:border-red-600 group"
+            >
+              <div className="flex items-center gap-3">
+                <span className="w-8 h-8 rounded-xl bg-red-600/30 border border-red-500/50 flex items-center justify-center shrink-0">
+                  <Flame className="w-4 h-4 text-red-400 animate-pulse" />
+                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-extrabold text-red-300 uppercase tracking-wide">
+                      Community Outbreak Alert
+                    </span>
+                    <span className="text-[10px] bg-red-600/40 text-red-200 px-2 py-0.2 rounded-full border border-red-500/30 font-bold">
+                      {nearbyOutbreaksCount} Active Threats ≤ 50km
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    Local smallholder farmers and Agritex extension wards reported pest/disease outbreaks near your location ({currentLocationName}).
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs font-bold text-red-300 group-hover:text-white shrink-0 ml-2">
+                <span>View Heat Map</span>
+                <ChevronRight className="w-4 h-4 transition group-hover:translate-x-1" />
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Column: Input, Camera, Field Notes */}
           <div className="lg:col-span-5 space-y-4">
             <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
@@ -679,7 +754,7 @@ export const HealthDiagnostics: React.FC<Props> = ({
                         </h4>
                       </div>
                       <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
-                        {diagnosticResult.primaryRemedy.manufacturer}
+                        DR&SS Registered
                       </span>
                     </div>
 
@@ -757,7 +832,7 @@ export const HealthDiagnostics: React.FC<Props> = ({
                     <Award className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                     <div>
                       <span className="font-bold text-emerald-300 block mb-0.5">
-                        Agritex Master Farmer (Hurudza) Advisory:
+                        Agritex Master Farmer Advisory:
                       </span>
                       <p className="text-slate-300 leading-relaxed">
                         {diagnosticResult.agritexAdvisoryNote}
@@ -767,15 +842,25 @@ export const HealthDiagnostics: React.FC<Props> = ({
 
                   {/* Action Bar */}
                   <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100">
-                    {matchedDbRecord && (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {matchedDbRecord && (
+                        <button
+                          onClick={() => setInspectingRecord(matchedDbRecord)}
+                          className="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 transition"
+                        >
+                          <BookOpen className="w-3.5 h-3.5" />
+                          Database Monograph ({matchedDbRecord.eppoCode}) →
+                        </button>
+                      )}
+
                       <button
-                        onClick={() => setInspectingRecord(matchedDbRecord)}
-                        className="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 transition"
+                        onClick={() => setActiveView('outbreaks')}
+                        className="text-xs font-bold text-red-700 hover:text-red-900 flex items-center gap-1 transition bg-red-50 hover:bg-red-100 border border-red-200 px-2.5 py-1 rounded-lg"
                       >
-                        <BookOpen className="w-3.5 h-3.5" />
-                        View Complete Database Monograph ({matchedDbRecord.eppoCode}) →
+                        <Flame className="w-3.5 h-3.5 text-red-600" />
+                        View Outbreak Heat Map Near Farm →
                       </button>
-                    )}
+                    </div>
 
                     <button
                       onClick={() => {
@@ -823,7 +908,8 @@ export const HealthDiagnostics: React.FC<Props> = ({
             )}
           </div>
         </div>
-      )}
+      </div>
+    )}
 
       {/* VIEW 2: REAL PLANT PEST & DISEASE DATABASE EXPLORER */}
       {activeView === 'database' && (
@@ -1017,7 +1103,7 @@ export const HealthDiagnostics: React.FC<Props> = ({
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                 <tr>
-                  <th className="p-3.5">Product & Manufacturer</th>
+                  <th className="p-3.5">Trade Name & Registration</th>
                   <th className="p-3.5">Category</th>
                   <th className="p-3.5">Active Ingredient</th>
                   <th className="p-3.5">Target Condition</th>
@@ -1031,7 +1117,7 @@ export const HealthDiagnostics: React.FC<Props> = ({
                   <tr key={chem.id} className="hover:bg-slate-50 transition">
                     <td className="p-3.5">
                       <div className="font-bold text-slate-900">{chem.brandName}</div>
-                      <div className="text-[10px] text-slate-500">{chem.manufacturer}</div>
+                      <div className="text-[10px] text-slate-500">{chem.activeIngredient}</div>
                     </td>
                     <td className="p-3.5">
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
@@ -1064,6 +1150,26 @@ export const HealthDiagnostics: React.FC<Props> = ({
             </table>
           </div>
         </div>
+      )}
+
+      {/* VIEW 4: REAL COMMUNITY OUTBREAK HEAT MAP */}
+      {activeView === 'outbreaks' && (
+        <CommunityOutbreakHeatMapView
+          currentLocationName={currentLocationName}
+          selectedLocation={selectedLocation}
+          isOfflineMode={isOfflineMode}
+          onNavigateToScannerWithRecord={(pestRecordId) => {
+            const foundRec = REAL_PEST_DISEASE_DATABASE.find(p => p.id === pestRecordId);
+            if (foundRec) {
+              prefillFromDatabaseRecord(foundRec);
+            } else {
+              setActiveView('scanner');
+            }
+          }}
+          onNavigateToChemicalRegister={() => {
+            setActiveView('chemicals');
+          }}
+        />
       )}
 
       {/* FULL RECORD DOSSIER MODAL */}
@@ -1151,7 +1257,7 @@ export const HealthDiagnostics: React.FC<Props> = ({
                     <span className="text-emerald-700">{inspectingRecord.primaryRegisteredControl.estimatedCostUsd}</span>
                   </div>
                   <div className="text-slate-600 font-mono text-[11px]">
-                    Active: {inspectingRecord.primaryRegisteredControl.activeIngredient} ({inspectingRecord.primaryRegisteredControl.manufacturer})
+                    Active: {inspectingRecord.primaryRegisteredControl.activeIngredient}
                   </div>
                   <div className="pt-2 border-t border-slate-100 text-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                     <div>

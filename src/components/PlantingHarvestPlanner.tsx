@@ -24,11 +24,15 @@ import {
   CalendarCheck2,
   Check,
   Flame,
-  ArrowRight
+  ArrowRight,
+  RotateCcw,
+  Share2,
+  FileText
 } from 'lucide-react';
 import { ZimbabweLocation } from '../data/zimbabweLocations';
 import { MASTER_CROPS, CropRecommendation } from '../data/agronomyData';
 import { REGION_CLIMATIC_CYCLES } from '../data/climaticCycles';
+import { CropRotationAssistant } from './CropRotationAssistant';
 import { 
   CropCalendarPlan, 
   PlannerReminder, 
@@ -38,8 +42,11 @@ import {
   getDaysDifferenceFromToday,
   addDaysToDate,
   getSavedReminders,
-  saveReminders
+  saveReminders,
+  buildPlantingHarvestWhatsAppShare
 } from '../utils/calendarPlanner';
+import { downloadPlantingHarvestPlanPDF } from '../utils/pdfAdvisoryGenerator';
+import { buildWhatsAppUniversalShare } from '../data/farmersDictionaryData';
 
 interface Props {
   selectedLocation: ZimbabweLocation;
@@ -75,7 +82,7 @@ export const PlantingHarvestPlanner: React.FC<Props> = ({
   >('rainfed_pfumvudza');
 
   // Sub-view Tab inside Planner
-  const [activePlannerTab, setActivePlannerTab] = useState<'timeline' | 'reminders' | 'climatic' | 'calendar_grid'>('timeline');
+  const [activePlannerTab, setActivePlannerTab] = useState<'timeline' | 'reminders' | 'calendar_grid' | 'climatic' | 'rotation'>('timeline');
 
   // Selected date filter in calendar view
   const [selectedCalendarMonth, setSelectedCalendarMonth] = useState<number>(10); // 0-11: Nov = 10, Dec = 11, etc.
@@ -102,6 +109,32 @@ export const PlantingHarvestPlanner: React.FC<Props> = ({
   const plan: CropCalendarPlan = useMemo(() => {
     return generateCropCalendarPlan(activeCrop, selectedLocation, sowingDate, farmingSystem);
   }, [activeCrop, selectedLocation, sowingDate, farmingSystem]);
+
+  // Export & Sharing state
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
+  const [copiedPlanSuccess, setCopiedPlanSuccess] = useState<boolean>(false);
+
+  const handleDownloadPlanPdf = () => {
+    setIsGeneratingPdf(true);
+    try {
+      downloadPlantingHarvestPlanPDF(plan);
+    } finally {
+      setTimeout(() => setIsGeneratingPdf(false), 800);
+    }
+  };
+
+  const handleSharePlanWhatsApp = () => {
+    const text = buildPlantingHarvestWhatsAppShare(plan, selectedLocation);
+    const shareUrl = buildWhatsAppUniversalShare(text);
+    window.open(shareUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleCopyPlanToClipboard = () => {
+    const text = buildPlantingHarvestWhatsAppShare(plan, selectedLocation);
+    navigator.clipboard.writeText(text);
+    setCopiedPlanSuccess(true);
+    setTimeout(() => setCopiedPlanSuccess(false), 2500);
+  };
 
   // Load reminders on mount and sync
   useEffect(() => {
@@ -169,7 +202,7 @@ export const PlantingHarvestPlanner: React.FC<Props> = ({
 
     // If browser supports notifications, dispatch a notification
     if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('Hurudza Farm Reminder', {
+      new Notification('Farmers Dictionary Zw Reminder', {
         body: reminderTitle,
         icon: '/pwa-192x192.png',
       });
@@ -402,20 +435,39 @@ export const PlantingHarvestPlanner: React.FC<Props> = ({
             </select>
           </div>
 
-          {/* Action: Export to Phone / Calendar */}
-          <div className="flex items-center gap-2">
+          {/* Action: Export to PDF, WhatsApp, Calendar, Add Reminder */}
+          <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => exportCalendarToIcs(plan)}
-              className="w-full py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center justify-center gap-2"
-              title="Download standard .ics calendar file to sync with phone/Google Calendar"
+              onClick={handleDownloadPlanPdf}
+              disabled={isGeneratingPdf}
+              className="py-2.5 px-3 bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+              title="Download official Agritex Planting & Harvest Schedule in PDF"
             >
               <Download className="w-3.5 h-3.5" />
-              Sync to Phone (.ics)
+              <span>{isGeneratingPdf ? 'Exporting...' : 'Export PDF'}</span>
+            </button>
+
+            <button
+              onClick={handleSharePlanWhatsApp}
+              className="py-2.5 px-3 bg-[#25D366] hover:bg-[#1EBE5D] text-white rounded-xl text-xs font-bold transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+              title="Share full planting calendar and DAP milestones to WhatsApp"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              <span>WhatsApp</span>
+            </button>
+
+            <button
+              onClick={() => exportCalendarToIcs(plan)}
+              className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
+              title="Sync calendar with phone / Google Calendar (.ics)"
+            >
+              <CalendarRange className="w-3.5 h-3.5 text-slate-600" />
+              <span>Sync .ics</span>
             </button>
 
             <button
               onClick={() => setShowAddReminderModal(true)}
-              className="py-2.5 px-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shrink-0"
+              className="py-2.5 px-3 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
               title="Add a custom reminder for this season"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -447,7 +499,7 @@ export const PlantingHarvestPlanner: React.FC<Props> = ({
           <div className="text-xs">
             <span className="text-slate-500 block">Projected Harvest Window:</span>
             <span className="font-bold text-emerald-700 flex items-center gap-1">
-              <Sparkles className="w-3 h-3" />
+              <Sparkles className="w-3.5 h-3.5" />
               {formatFriendlyDate(plan.projectedHarvestDate)}
             </span>
           </div>
@@ -461,6 +513,58 @@ export const PlantingHarvestPlanner: React.FC<Props> = ({
                   ? 'Harvest Day Today!' 
                   : 'Harvest completed'}
             </span>
+          </div>
+        </div>
+
+        {/* Quick Action Export Strip for WhatsApp & PDF */}
+        <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200">
+          <div className="flex items-center gap-3">
+            <span className="w-9 h-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-bold text-base shrink-0 shadow-xs">
+              🌾
+            </span>
+            <div>
+              <h5 className="font-black text-xs sm:text-sm text-emerald-950">
+                Official Seasonal Calendar Export & Field Sharing
+              </h5>
+              <p className="text-[11px] text-emerald-800 leading-snug">
+                Export full Pfumvudza fertilizer dates, growth phases, and harvest benchmarks to official PDF dossier or WhatsApp.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={handleDownloadPlanPdf}
+              disabled={isGeneratingPdf}
+              className="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer disabled:opacity-50"
+              title="Download official DR&SS/Agritex planting and harvest plan in PDF"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>{isGeneratingPdf ? 'Generating PDF...' : 'Download PDF Plan'}</span>
+            </button>
+
+            <button
+              onClick={handleSharePlanWhatsApp}
+              className="px-3.5 py-2 bg-[#25D366] hover:bg-[#1EBE5D] active:bg-[#169C4B] text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer"
+              title="Share planting milestones and input dosages directly to WhatsApp"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              <span>Share to WhatsApp</span>
+            </button>
+
+            <button
+              onClick={handleCopyPlanToClipboard}
+              className="px-3 py-2 bg-white hover:bg-slate-50 border border-emerald-300 text-emerald-900 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+            >
+              {copiedPlanSuccess ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="text-emerald-700">Copied!</span>
+                </>
+              ) : (
+                <span>Copy Plan</span>
+              )}
+            </button>
           </div>
         </div>
       </div>
@@ -513,6 +617,18 @@ export const PlantingHarvestPlanner: React.FC<Props> = ({
         >
           <Compass className="w-3.5 h-3.5" />
           4. Region {selectedLocation.naturalRegion} Climatic Cycles
+        </button>
+
+        <button
+          onClick={() => setActivePlannerTab('rotation')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 ${
+            activePlannerTab === 'rotation'
+              ? 'bg-emerald-800 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+        >
+          <RotateCcw className="w-3.5 h-3.5 text-emerald-400" />
+          5. Crop Rotation Assistant (Soil Health & N-Fixing)
         </button>
       </div>
 
@@ -1081,6 +1197,17 @@ export const PlantingHarvestPlanner: React.FC<Props> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* TAB 5: CROP ROTATION ASSISTANT */}
+      {activePlannerTab === 'rotation' && (
+        <CropRotationAssistant
+          selectedLocation={selectedLocation}
+          onApplyCropToPlanner={(cropId) => {
+            setSelectedCropId(cropId);
+            setActivePlannerTab('timeline');
+          }}
+        />
       )}
 
       {/* Modal: Add Custom Reminder */}

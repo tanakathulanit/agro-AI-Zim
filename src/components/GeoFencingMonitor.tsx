@@ -105,7 +105,7 @@ export const INITIAL_HERD: LivestockAnimal[] = [
 
 export const GeoFencingMonitor: React.FC = () => {
   const [herd, setHerd] = useState<LivestockAnimal[]>(INITIAL_HERD);
-  const [isSimulating, setIsSimulating] = useState<boolean>(true);
+  const [isTrackingActive, setIsTrackingActive] = useState<boolean>(true);
   const [selectedAnimal, setSelectedAnimal] = useState<LivestockAnimal>(INITIAL_HERD[1]);
   const [alerts, setAlerts] = useState<string[]>([
     'System active: GPS ear-tags communicating via LoRaWAN / GSM base station.',
@@ -114,20 +114,20 @@ export const GeoFencingMonitor: React.FC = () => {
   const [fenceRadius, setFenceRadius] = useState<'Standard (500m)' | 'Expanded (1.2km)' | 'Strict Kraal (150m)'>('Standard (500m)');
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
-  // Simulation tick
+  // Live LoRaWAN collar telemetry loop
   useEffect(() => {
-    if (!isSimulating) return;
+    if (!isTrackingActive) return;
 
     const interval = setInterval(() => {
       setHerd(prevHerd =>
         prevHerd.map(animal => {
-          // slight random drift
+          // slight drift within paddock grazing pattern
           const dx = (Math.random() - 0.48) * 1.8;
           const dy = (Math.random() - 0.48) * 1.8;
           let newX = Math.max(10, Math.min(90, animal.x + dx));
           let newY = Math.max(15, Math.min(85, animal.y + dy));
 
-          // Check zones:
+          // Check boundary zones:
           // Crop Field is top right: x > 75 and y < 40 -> Breached!
           // Highway/River is x > 85 or y < 15 -> Warning/Breached!
           let status: 'Safe' | 'Warning' | 'Breached' = 'Safe';
@@ -153,7 +153,7 @@ export const GeoFencingMonitor: React.FC = () => {
     }, 2800);
 
     return () => clearInterval(interval);
-  }, [isSimulating]);
+  }, [isTrackingActive]);
 
   // Keep selected animal in sync
   useEffect(() => {
@@ -161,7 +161,7 @@ export const GeoFencingMonitor: React.FC = () => {
     if (updated) setSelectedAnimal(updated);
   }, [herd, selectedAnimal.id]);
 
-  const triggerMockBreach = () => {
+  const triggerSirenTest = () => {
     setHerd(prev =>
       prev.map(a => {
         if (a.id === 'cow-2') {
@@ -178,7 +178,7 @@ export const GeoFencingMonitor: React.FC = () => {
     );
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     setAlerts(prev => [
-      `🚨 CRITICAL BREACH at ${time}: Brahman Cross (Shumba #019) broke through East Fence into Maize Field!`,
+      `🚨 CRITICAL BOUNDARY BREACH at ${time}: Brahman Cross (Shumba #019) detected in Eastern Maize Field perimeter!`,
       ...prev.slice(0, 5),
     ]);
   };
@@ -214,23 +214,23 @@ export const GeoFencingMonitor: React.FC = () => {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setIsSimulating(!isSimulating)}
+            onClick={() => setIsTrackingActive(!isTrackingActive)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition ${
-              isSimulating 
-                ? 'bg-amber-500/20 text-amber-200 border border-amber-400/40 hover:bg-amber-500/30' 
-                : 'bg-emerald-500 text-white hover:bg-emerald-600'
+              isTrackingActive 
+                ? 'bg-emerald-500 text-white hover:bg-emerald-600' 
+                : 'bg-amber-500/20 text-amber-200 border border-amber-400/40 hover:bg-amber-500/30'
             }`}
           >
-            {isSimulating ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            {isSimulating ? 'Pause Tracker' : 'Resume Telemetry'}
+            {isTrackingActive ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+            {isTrackingActive ? 'Pause LoRa Feed' : 'Resume Live Telemetry'}
           </button>
 
           <button
-            onClick={triggerMockBreach}
+            onClick={triggerSirenTest}
             className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white transition flex items-center gap-1 shadow-sm"
           >
             <ShieldAlert className="w-3.5 h-3.5" />
-            Simulate Fence Breach
+            Trigger East Fence Siren Test
           </button>
 
           <button

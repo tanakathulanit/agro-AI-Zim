@@ -9,18 +9,16 @@ import {
   HardDrive 
 } from 'lucide-react';
 import { getOfflineOutbox, clearSyncedOutboxItems, OfflineQueueItem } from '../utils/offlineStorage';
+import { useTranslation } from '../context/LanguageContext';
 
 interface Props {
-  isSimulatedOffline: boolean;
-  onToggleSimulatedOffline: () => void;
   onSyncComplete?: () => void;
 }
 
 export const OfflineManagerBanner: React.FC<Props> = ({
-  isSimulatedOffline,
-  onToggleSimulatedOffline,
   onSyncComplete,
 }) => {
+  const { t } = useTranslation();
   const [actualOnline, setActualOnline] = useState<boolean>(
     typeof navigator !== 'undefined' ? navigator.onLine : true
   );
@@ -50,7 +48,7 @@ export const OfflineManagerBanner: React.FC<Props> = ({
     };
   }, []);
 
-  const isEffectivelyOffline = isSimulatedOffline || !actualOnline;
+  const isEffectivelyOffline = !actualOnline;
 
   const handleTriggerSync = () => {
     if (isEffectivelyOffline) {
@@ -93,21 +91,21 @@ export const OfflineManagerBanner: React.FC<Props> = ({
             <div className="flex items-center gap-2">
               <span className="font-extrabold text-white text-xs">
                 {isEffectivelyOffline 
-                  ? 'OFFLINE MODE ACTIVE' 
-                  : 'ONLINE & CLOUD CONNECTED'}
+                  ? t('offline_status_offline')
+                  : t('offline_status_online')}
               </span>
               <span className={`text-[10px] font-bold px-2 py-0.2 rounded-full ${
                 isEffectivelyOffline 
                   ? 'bg-amber-400 text-amber-950' 
                   : 'bg-emerald-500/30 text-emerald-300'
               }`}>
-                {isEffectivelyOffline ? 'Pre-Downloaded Database' : 'Live Sync'}
+                {isEffectivelyOffline ? 'Database' : 'Live Sync'}
               </span>
             </div>
             <p className="text-[11px] text-slate-300">
               {isEffectivelyOffline
-                ? 'All diagnostic tools, historical weather, soil profiles, and cached market prices are available offline.'
-                : 'Real-time telemetry and cloud sync active. Ready for field use.'}
+                ? 'All diagnostic tools, historical weather, soil profiles, and cached market prices are available on-device.'
+                : 'Real-time telemetry and cloud sync active. Ready for smallholder field use.'}
             </p>
           </div>
         </div>
@@ -132,26 +130,6 @@ export const OfflineManagerBanner: React.FC<Props> = ({
               Sync Outbox Now
             </button>
           )}
-
-          {/* Simulated Offline Toggle */}
-          <button
-            onClick={onToggleSimulatedOffline}
-            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition flex items-center gap-1.5 ${
-              isSimulatedOffline
-                ? 'bg-amber-500 text-slate-950 border-amber-400 hover:bg-amber-400'
-                : 'bg-white/10 hover:bg-white/20 text-slate-200 border-white/20'
-            }`}
-          >
-            {isSimulatedOffline ? (
-              <>
-                <Wifi className="w-3 h-3" /> Restore Online
-              </>
-            ) : (
-              <>
-                <WifiOff className="w-3 h-3 text-amber-400" /> Simulate Offline
-              </>
-            )}
-          </button>
         </div>
       </div>
 

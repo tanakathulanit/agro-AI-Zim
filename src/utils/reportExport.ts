@@ -16,10 +16,10 @@ export function exportCropAuditToCsv(
   farmerName = 'Smallholder Farmer'
 ) {
   const dateStr = new Date().toISOString().split('T')[0];
-  const filename = `Hurudza_Crop_Audit_${location.district}_${dateStr}.csv`;
+  const filename = `Agritex_Crop_Audit_${location.district}_${dateStr}.csv`;
 
   const rows: string[][] = [
-    ['HURUDZA SMART AGRO-ADVISORY SYSTEM - ZIMBABWE'],
+    ['FARMERS DICTIONARY ZW - SMART AGRO-ADVISORY SYSTEM'],
     ['SMALLHOLDER INPUT VS YIELD AUDIT REPORT (FINANCIAL STATEMENT)'],
     ['Generated For:', 'Micro-Loan Application & Personal Record Keeping'],
     ['Date of Audit:', dateStr],
@@ -40,10 +40,10 @@ export function exportCropAuditToCsv(
     [''],
     ['--- 2. ITEMIZED VARIABLE INPUT EXPENSES ---'],
     ['Input Category', 'Cost (USD)', 'Cost (ZiG)', 'Agritex Placement Rate'],
-    ['Certified Hybrid Seed', `$${input.seedCostUsd.toFixed(2)}`, `ZiG ${(input.seedCostUsd * 28.5).toFixed(2)}`, 'Seed Co / Pannar certified seed'],
-    ['Basal Fertilizer (Compound D)', `$${input.compoundDFertilizerCostUsd.toFixed(2)}`, `ZiG ${(input.compoundDFertilizerCostUsd * 28.5).toFixed(2)}`, 'Windmill / ZFC 7:14:7 basal placement'],
-    ['Top Dressing Fertilizer (AN)', `$${input.anTopDressingCostUsd.toFixed(2)}`, `ZiG ${(input.anTopDressingCostUsd * 28.5).toFixed(2)}`, 'Sable Chemicals AN 34.5% N'],
-    ['Agrochemicals & Crop Protection', `$${input.chemicalsAgrochemicalsCostUsd.toFixed(2)}`, `ZiG ${(input.chemicalsAgrochemicalsCostUsd * 28.5).toFixed(2)}`, 'Agricura Karate Zeon / Fungicide'],
+    ['Certified Hybrid Seed', `$${input.seedCostUsd.toFixed(2)}`, `ZiG ${(input.seedCostUsd * 28.5).toFixed(2)}`, 'Certified Hybrid seed (treated)'],
+    ['Basal Fertilizer (Compound D)', `$${input.compoundDFertilizerCostUsd.toFixed(2)}`, `ZiG ${(input.compoundDFertilizerCostUsd * 28.5).toFixed(2)}`, 'Compound D 7:14:7 basal placement'],
+    ['Top Dressing Fertilizer (AN)', `$${input.anTopDressingCostUsd.toFixed(2)}`, `ZiG ${(input.anTopDressingCostUsd * 28.5).toFixed(2)}`, 'Ammonium Nitrate (AN 34.5% N)'],
+    ['Agrochemicals & Crop Protection', `$${input.chemicalsAgrochemicalsCostUsd.toFixed(2)}`, `ZiG ${(input.chemicalsAgrochemicalsCostUsd * 28.5).toFixed(2)}`, 'Insecticide / Fungicide protective sprays'],
     ['Labor & Transport Haulage', `$${input.laborAndHaulageCostUsd.toFixed(2)}`, `ZiG ${(input.laborAndHaulageCostUsd * 28.5).toFixed(2)}`, 'Land prep, Pfumvudza digging & haulage'],
     ['TOTAL VARIABLE INPUT COSTS', `$${result.totalVariableCostsUsd.toFixed(2)}`, `ZiG ${result.totalVariableCostsZig.toLocaleString()}`, 'All operating production outlays'],
     [''],
@@ -56,7 +56,7 @@ export function exportCropAuditToCsv(
     ['Net Profit per Bag', `$${result.profitPerBagUsd.toFixed(2)}`, 'Target: > $4.50', 'Buffer against price shocks'],
     ['Breakeven Harvest Yield', `${result.breakEvenYieldBags} bags`, 'Target: < 9 bags', `Surplus over breakeven: +${input.actualHarvestBags50kg - result.breakEvenYieldBags} bags`],
     ['Nitrogen Use Efficiency (NUE)', `${result.nitrogenUseEfficiencyKgPerKg} kg/kg N`, '25 - 35 kg grain / kg N', 'Agronomic technical efficiency score'],
-    ['Hurudza Efficiency Grade', result.efficiencyGrade, 'Master Farmer (Hurudza)', 'Bank Credit Worthiness Recommendation'],
+    ['Agro-Efficiency Grade', result.efficiencyGrade, 'Master Farmer Certified', 'Bank Credit Worthiness Recommendation'],
     [''],
     ['Extension Verification:', result.efficiencyAdvice.replace(/,/g, ';')],
     ['Signature of Extension Officer:', '___________________________', 'Date:', '_________________'],
@@ -88,10 +88,10 @@ export function exportLivestockAuditToCsv(
   farmerName = 'Livestock Keeper'
 ) {
   const dateStr = new Date().toISOString().split('T')[0];
-  const filename = `Hurudza_Livestock_Audit_${location.district}_${dateStr}.csv`;
+  const filename = `Agritex_Livestock_Audit_${location.district}_${dateStr}.csv`;
 
   const rows: string[][] = [
-    ['HURUDZA SMART AGRO-ADVISORY SYSTEM - ZIMBABWE'],
+    ['FARMERS DICTIONARY ZW - SMART AGRO-ADVISORY SYSTEM'],
     ['LIVESTOCK PRODUCTION & ENTERPRISE AUDIT REPORT'],
     ['Generated For:', 'Micro-Finance Loan Records & Vet Compliance'],
     ['Date:', dateStr],

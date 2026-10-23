@@ -24,7 +24,7 @@ export interface ForumPost {
   title: string;
   content: string;
   author: string;
-  authorRole: 'Master Farmer (Hurudza)' | 'Agritex Extension Officer' | 'Smallholder Farmer' | 'Vet Technician';
+  authorRole: 'Master Farmer' | 'Agritex Extension Officer' | 'Smallholder Farmer' | 'Vet Technician';
   location: string;
   province: string;
   cropTag: 'Maize' | 'Sorghum' | 'Groundnuts' | 'Tomatoes' | 'Cattle' | 'Goats' | 'Small Grains' | 'General Pfumvudza';
@@ -51,7 +51,7 @@ const INITIAL_FORUM_POSTS: ForumPost[] = [
     title: 'How we achieved 24 bags of maize per Pfumvudza plot in Domboshava',
     content: 'Fellow farmers, we strictly kept 75cm x 60cm basin spacing and applied 1 standard beer bottle cap of Compound D covered with 2cm soil. What changed the game during the January dry spell was 5cm of thatch grass mulch—the soil stayed damp for 18 days without rain!',
     author: 'Cde. Mavis Mutasa',
-    authorRole: 'Master Farmer (Hurudza)',
+    authorRole: 'Master Farmer',
     location: 'Domboshava, Goromonzi',
     province: 'Mashonaland East',
     cropTag: 'Maize',
@@ -82,7 +82,7 @@ const INITIAL_FORUM_POSTS: ForumPost[] = [
   {
     id: 'post-2',
     title: 'URGENT PEST ALERT: Early Fall Armyworm larvae spotted in Mazowe Concession',
-    content: 'Inspected 5 plots along the valley yesterday. Found pinhole damage and green frass in 3rd leaf whorls. Please scout early mornings. We sprayed Agricura Karate Zeon 5CS (18ml per knapsack) before the caterpillars could burrow deep into the stem.',
+    content: 'Inspected 5 plots along the valley yesterday. Found pinhole damage and green frass in 3rd leaf whorls. Please scout early mornings. We sprayed Karate Zeon 5CS (18ml per knapsack) before the caterpillars could burrow deep into the stem.',
     author: 'Tafadzwa Nyoni',
     authorRole: 'Smallholder Farmer',
     location: 'Concession, Mazowe',
@@ -97,7 +97,7 @@ const INITIAL_FORUM_POSTS: ForumPost[] = [
     replies: [
       {
         id: 'rep-3',
-        author: 'Agricura Field Tech',
+        author: 'Agritex Plant Protection Tech',
         authorRole: 'Vet Technician',
         content: 'Correct action. Ensure application reaches down into the central funnel. If larvae exceed 15mm, rotate to Ampligo.',
         createdAt: '3 hours ago',
@@ -110,7 +110,7 @@ const INITIAL_FORUM_POSTS: ForumPost[] = [
     title: 'Success with SV-2 White Sorghum in Gokwe South drought season',
     content: 'While hybrid maize failed during the February dry spell, our SV-2 sorghum yielded 14 bags. The local GMB depot bought at $335/tonne with zero deduction. Recommend every farmer in Region IV plant at least 2 plots of small grains as food insurance.',
     author: 'Sekuru Sibanda',
-    authorRole: 'Master Farmer (Hurudza)',
+    authorRole: 'Master Farmer',
     location: 'Nembudziya, Gokwe South',
     province: 'Midlands',
     cropTag: 'Sorghum',
@@ -227,7 +227,7 @@ export const CommunityForum: React.FC<Props> = ({
       });
       setFeedbackBanner('Offline Outbox: Your post has been saved locally and will broadcast to the community once cellular connectivity is restored.');
     } else {
-      setFeedbackBanner('Post shared successfully with the Hurudza community!');
+      setFeedbackBanner('Post shared successfully with the Farmers Dictionary Zw community!');
     }
 
     setPosts([newPost, ...posts]);
@@ -311,7 +311,7 @@ export const CommunityForum: React.FC<Props> = ({
                 👥
               </span>
               <h3 className="text-base font-bold text-slate-900">
-                Hurudza Farmers Forum (Dare reVarimi / Inkundla Yabalimi)
+                Farmers Dictionary Zw Community Forum (Dare reVarimi / Inkundla Yabalimi)
               </h3>
             </div>
             <p className="text-xs text-slate-500 max-w-2xl">

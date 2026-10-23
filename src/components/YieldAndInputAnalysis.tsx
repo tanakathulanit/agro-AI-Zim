@@ -175,7 +175,7 @@ export const YieldAndInputAnalysis: React.FC<Props> = ({
             <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4">
               <h4 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
                 <BarChart3 className="w-4 h-4 text-emerald-700" />
-                Yield Simulation Parameters
+                Zimbabwe Agro-Climatic Production Model
               </h4>
 
               {/* Crop Selector */}
@@ -459,7 +459,7 @@ export const YieldAndInputAnalysis: React.FC<Props> = ({
                 <Award className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                 <div>
                   <span className="font-bold text-emerald-300 block mb-0.5">
-                    Hurudza Agronomic Action Directive
+                    Agritex Agronomic Action Directive
                   </span>
                   <p className="text-slate-200 leading-relaxed">
                     {yieldPrediction.advisoryCommentary}

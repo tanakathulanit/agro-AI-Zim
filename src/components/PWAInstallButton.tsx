@@ -39,11 +39,11 @@ export const PWAInstallButton: React.FC = () => {
         {showIOSGuide && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
             <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl border border-slate-200">
-              <h3 className="text-base font-bold text-slate-900">Install Hurudza on iPhone / iPad</h3>
+              <h3 className="text-base font-bold text-slate-900">Install Farmers Dictionary Zw</h3>
               <p className="mt-2 text-xs text-slate-600 leading-relaxed">
                 1. Tap the <strong>Share</strong> icon in the Safari navigation bar.<br />
                 2. Scroll down and tap <strong>Add to Home Screen</strong>.<br />
-                3. Hurudza will launch full-screen with offline caching enabled.
+                3. Farmers Dictionary Zw will launch full-screen with offline caching and WhatsApp features enabled.
               </p>
               <button
                 onClick={() => setShowIOSGuide(false)}

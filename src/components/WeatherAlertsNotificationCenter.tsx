@@ -23,7 +23,6 @@ import {
   evaluateWeatherHazards, 
   sendNativePushNotification, 
   playAlertChime, 
-  SIMULATED_EXTREME_SCENARIOS, 
   AlertSeverity 
 } from '../utils/extremeWeatherAlerts';
 import { WeatherStation } from '../data/weatherStations';
@@ -69,7 +68,7 @@ export const WeatherAlertsNotificationCenter: React.FC<Props> = ({
       if (permission === 'granted') {
         setToastMessage('Push notifications enabled! You will receive urgent weather alerts.');
         // Send a test welcome push notification
-        new Notification('Hurudza Weather Alerts Activated', {
+        new Notification('Farmers Dictionary Zw Weather Alerts Activated', {
           body: `Subscribed to micro-climate emergency alerts from ${closestStation.name} (${distanceKm}km away).`,
           icon: '/icon.svg',
         });
@@ -80,36 +79,6 @@ export const WeatherAlertsNotificationCenter: React.FC<Props> = ({
       console.warn('Permission request error:', err);
     }
     setTimeout(() => setToastMessage(null), 4000);
-  };
-
-  // Trigger a simulated extreme weather alert
-  const triggerSimulation = async (scenarioKey: 'hail_storm' | 'heatwave_drought' | 'winter_frost') => {
-    const scenario = SIMULATED_EXTREME_SCENARIOS[scenarioKey];
-    const newAlert: WeatherNotificationAlert = {
-      ...scenario,
-      id: `sim-${scenarioKey}-${Date.now()}`,
-      timestamp: `Simulated at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-      isRead: false,
-    };
-
-    // Prepend to alerts list
-    setAlerts(prev => [newAlert, ...prev]);
-    setSelectedAlert(newAlert);
-    setIsPanelOpen(true);
-
-    // Play chime sound if not muted
-    if (!isAudioMuted) {
-      playAlertChime(newAlert.severity);
-    }
-
-    // Attempt native push notification
-    const pushSent = await sendNativePushNotification(newAlert);
-    setToastMessage(
-      pushSent 
-        ? `Native push alert dispatched for ${newAlert.title}` 
-        : `Extreme weather alert triggered: ${newAlert.title}`
-    );
-    setTimeout(() => setToastMessage(null), 5000);
   };
 
   const criticalCount = alerts.filter(a => a.severity === 'CRITICAL').length;
@@ -206,35 +175,18 @@ export const WeatherAlertsNotificationCenter: React.FC<Props> = ({
               )}
             </div>
 
-            {/* Test Simulation Buttons Bar */}
-            <div className="p-3 bg-amber-50/60 border-b border-amber-200 text-xs">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="font-bold text-amber-950 flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                  Simulate Extreme Weather Scenarios:
+            {/* MSD Emergency Bulletin Dispatches Bar */}
+            <div className="p-3 bg-emerald-950 text-white border-b border-emerald-800 text-xs">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-bold text-emerald-200 flex items-center gap-1.5">
+                  <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                  Meteorological Services Department (MSD) Live Network
                 </span>
-                <span className="text-[10px] text-amber-800 font-semibold">Instant Telemetry Test</span>
+                <span className="text-[10px] text-emerald-300 font-semibold">Harare Central Node</span>
               </div>
-              <div className="flex flex-wrap gap-1.5">
-                <button
-                  onClick={() => triggerSimulation('hail_storm')}
-                  className="px-2.5 py-1 bg-white hover:bg-rose-50 border border-rose-300 text-rose-900 rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs"
-                >
-                  <CloudRain className="w-3 h-3 text-rose-600" /> Severe Hailstorm (65mm)
-                </button>
-                <button
-                  onClick={() => triggerSimulation('heatwave_drought')}
-                  className="px-2.5 py-1 bg-white hover:bg-amber-50 border border-amber-300 text-amber-900 rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs"
-                >
-                  <Flame className="w-3 h-3 text-amber-600" /> 40.5°C Heatwave
-                </button>
-                <button
-                  onClick={() => triggerSimulation('winter_frost')}
-                  className="px-2.5 py-1 bg-white hover:bg-blue-50 border border-blue-300 text-blue-900 rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs"
-                >
-                  <Snowflake className="w-3 h-3 text-blue-600" /> Black Frost (-1.5°C)
-                </button>
-              </div>
+              <p className="text-[11px] text-slate-300">
+                Connected to station <strong>{closestStation.name}</strong> ({distanceKm} km from {currentLocation.name}). Real-time telemetry monitoring for hailstorms, Lowveld heatwaves, and ground frost alerts across Natural Regions I to V.
+              </p>
             </div>
 
             {/* Alerts Feed Body */}

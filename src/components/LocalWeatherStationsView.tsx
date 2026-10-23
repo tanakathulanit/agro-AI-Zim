@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   ZimbabweLocation 
 } from '../data/zimbabweLocations';
@@ -22,8 +22,12 @@ import {
   Layers, 
   ArrowRight,
   ShieldAlert,
-  Sprout
+  Sprout,
+  RefreshCw,
+  Calendar,
+  Sparkles
 } from 'lucide-react';
+import { fetchLiveWeather, LiveWeatherData } from '../services/weatherService';
 
 interface Props {
   currentLocation: ZimbabweLocation;
@@ -42,6 +46,31 @@ export const LocalWeatherStationsView: React.FC<Props> = ({
 
   const [selectedStationId, setSelectedStationId] = useState<string>(rankedStations[0].id);
   const activeStation = rankedStations.find(s => s.id === selectedStationId) || rankedStations[0];
+
+  const [liveData, setLiveData] = useState<LiveWeatherData | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<string>('Just now');
+
+  const loadStationWeather = useCallback(async (force = false) => {
+    setIsLoading(true);
+    try {
+      const data = await fetchLiveWeather(
+        activeStation.coordinates.lat,
+        activeStation.coordinates.lng,
+        force
+      );
+      setLiveData(data);
+      setLastRefreshedAt(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    } catch (err) {
+      console.warn('Failed to load station weather:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [activeStation.coordinates.lat, activeStation.coordinates.lng]);
+
+  useEffect(() => {
+    loadStationWeather(false);
+  }, [loadStationWeather]);
 
   return (
     <div className="space-y-6">
@@ -97,11 +126,16 @@ export const LocalWeatherStationsView: React.FC<Props> = ({
           </div>
 
           <div className="flex items-center gap-2 text-xs shrink-0">
-            <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-3 py-1 rounded-full font-bold flex items-center gap-1">
-              <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-              Synced {activeStation.lastTelemetryMinsAgo}m ago
-            </span>
-            {activeStation.plantingMoistureTriggered ? (
+            <button
+              onClick={() => loadStationWeather(true)}
+              disabled={isLoading}
+              title="Refresh Real Satellite & AWS Telemetry"
+              className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-400/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 transition"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${isLoading ? 'animate-spin' : ''}`} />
+              <span>{isLoading ? 'Syncing...' : `Synced ${lastRefreshedAt}`}</span>
+            </button>
+            {activeStation.plantingMoistureTriggered || (liveData?.agricultural?.rainfall7DaysMm ?? 0) >= 28 ? (
               <span className="bg-emerald-500 text-slate-950 font-black px-3 py-1 rounded-full flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Sowing Trigger Active
@@ -115,15 +149,19 @@ export const LocalWeatherStationsView: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* 6 Key Hyper-Local Micro-Climate Sensors */}
+        {/* 6 Key Hyper-Local Micro-Climate Sensors (Real-Time Live Telemetry) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
           {/* Sensor 1: 24h & 7D Rain */}
           <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl p-3">
             <div className="flex items-center justify-between text-emerald-300 text-xs mb-1">
               <span className="flex items-center gap-1"><CloudRain className="w-3.5 h-3.5" /> 7-Day Rain</span>
             </div>
-            <div className="text-2xl font-black text-white">{activeStation.rainfall7DaysMm} mm</div>
-            <span className="text-[10px] text-slate-300 block mt-0.5">24h: {activeStation.rainfall24hMm} mm</span>
+            <div className="text-2xl font-black text-white">
+              {liveData?.agricultural?.rainfall7DaysMm ?? activeStation.rainfall7DaysMm} mm
+            </div>
+            <span className="text-[10px] text-slate-300 block mt-0.5">
+              24h: {liveData?.agricultural?.rainfall24hMm ?? activeStation.rainfall24hMm} mm
+            </span>
           </div>
 
           {/* Sensor 2: Soil Temperature (Seed Bed) */}
@@ -131,8 +169,12 @@ export const LocalWeatherStationsView: React.FC<Props> = ({
             <div className="flex items-center justify-between text-emerald-300 text-xs mb-1">
               <span className="flex items-center gap-1"><Thermometer className="w-3.5 h-3.5" /> Soil Temp (5cm)</span>
             </div>
-            <div className="text-2xl font-black text-white">{activeStation.soilTemp5cmC}°C</div>
-            <span className="text-[10px] text-slate-300 block mt-0.5">Root (10cm): {activeStation.soilTemp10cmC}°C</span>
+            <div className="text-2xl font-black text-white">
+              {liveData?.agricultural?.soilTempSeedbed5cmC ?? activeStation.soilTemp5cmC}°C
+            </div>
+            <span className="text-[10px] text-slate-300 block mt-0.5">
+              Root (10cm): {liveData?.agricultural?.soilTempRootzone10cmC ?? activeStation.soilTemp10cmC}°C
+            </span>
           </div>
 
           {/* Sensor 3: Air Temperature & Humidity */}
@@ -140,8 +182,12 @@ export const LocalWeatherStationsView: React.FC<Props> = ({
             <div className="flex items-center justify-between text-emerald-300 text-xs mb-1">
               <span className="flex items-center gap-1"><Droplets className="w-3.5 h-3.5" /> Humidity</span>
             </div>
-            <div className="text-2xl font-black text-white">{activeStation.relativeHumidityPct}%</div>
-            <span className="text-[10px] text-slate-300 block mt-0.5">Air: {activeStation.airTempC}°C</span>
+            <div className="text-2xl font-black text-white">
+              {liveData?.current?.relativeHumidityPct ?? activeStation.relativeHumidityPct}%
+            </div>
+            <span className="text-[10px] text-slate-300 block mt-0.5">
+              Air: {liveData?.current?.temperatureC ?? activeStation.airTempC}°C
+            </span>
           </div>
 
           {/* Sensor 4: Soil Moisture Saturation */}
@@ -149,16 +195,22 @@ export const LocalWeatherStationsView: React.FC<Props> = ({
             <div className="flex items-center justify-between text-emerald-300 text-xs mb-1">
               <span className="flex items-center gap-1"><Gauge className="w-3.5 h-3.5" /> Soil Moisture</span>
             </div>
-            <div className="text-2xl font-black text-white">{activeStation.soilMoistureSaturationPct}%</div>
-            <span className="text-[10px] text-slate-300 block mt-0.5">Capacity Saturation</span>
+            <div className="text-2xl font-black text-white">
+              {liveData?.agricultural?.soilMoisturePct ?? activeStation.soilMoistureSaturationPct}%
+            </div>
+            <span className="text-[10px] text-slate-300 block mt-0.5">
+              Capacity Saturation
+            </span>
           </div>
 
           {/* Sensor 5: Evapotranspiration ET0 */}
           <div className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl p-3">
             <div className="flex items-center justify-between text-emerald-300 text-xs mb-1">
-              <span className="flex items-center gap-1"><Sun className="w-3.5 h-3.5" /> ET₀ Moisture Loss</span>
+              <span className="flex items-center gap-1"><Sun className="w-3.5 h-3.5" /> ET₀ Loss</span>
             </div>
-            <div className="text-2xl font-black text-white">{activeStation.evapotranspirationEt0MmDay}</div>
+            <div className="text-2xl font-black text-white">
+              {liveData?.agricultural?.evapotranspirationEt0Mm ?? activeStation.evapotranspirationEt0MmDay}
+            </div>
             <span className="text-[10px] text-slate-300 block mt-0.5">mm/day evaporation</span>
           </div>
 
@@ -167,8 +219,12 @@ export const LocalWeatherStationsView: React.FC<Props> = ({
             <div className="flex items-center justify-between text-emerald-300 text-xs mb-1">
               <span className="flex items-center gap-1"><Wind className="w-3.5 h-3.5" /> Wind Speed</span>
             </div>
-            <div className="text-2xl font-black text-white">{activeStation.windSpeedKmh}</div>
-            <span className="text-[10px] text-slate-300 block mt-0.5">km/h ({activeStation.windDirection})</span>
+            <div className="text-2xl font-black text-white">
+              {liveData?.current?.windSpeedKmh ?? activeStation.windSpeedKmh}
+            </div>
+            <span className="text-[10px] text-slate-300 block mt-0.5">
+              km/h ({liveData?.current?.windDirectionCompass ?? activeStation.windDirection})
+            </span>
           </div>
         </div>
 
@@ -206,6 +262,80 @@ export const LocalWeatherStationsView: React.FC<Props> = ({
           )}
         </div>
       </div>
+
+      {/* 7-Day Day-by-Day Hyper-Local Agro-Climatic Forecast */}
+      {liveData?.dailyForecast && liveData.dailyForecast.length > 0 && (
+        <div className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+            <div>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-emerald-700" />
+                <h4 className="font-bold text-sm text-slate-900">
+                  7-Day Agro-Meteorological Sowing & Rainfall Forecast ({activeStation.name})
+                </h4>
+              </div>
+              <p className="text-xs text-slate-500">
+                Live precipitation projections & FAO-56 evapotranspiration (ET₀) to plan Pfumvudza sowing and basal fertilization.
+              </p>
+            </div>
+            <span className="text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-full flex items-center gap-1 shrink-0">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+              Open-Meteo High-Resolution Model
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+            {liveData.dailyForecast.map((day, idx) => {
+              const isRainExpected = day.precipitationSumMm >= 2.0;
+              const isHeavyRain = day.precipitationSumMm >= 15.0;
+
+              return (
+                <div 
+                  key={idx}
+                  className={`p-3 rounded-xl border flex flex-col justify-between text-xs transition ${
+                    isHeavyRain 
+                      ? 'bg-blue-50/70 border-blue-300' 
+                      : isRainExpected 
+                        ? 'bg-emerald-50/50 border-emerald-200' 
+                        : 'bg-slate-50 border-slate-200/70'
+                  }`}
+                >
+                  <div>
+                    <div className="text-[10px] text-slate-500 font-mono font-semibold">
+                      {new Date(day.date).toLocaleDateString('en-ZW', { weekday: 'short', month: 'short', day: 'numeric' })}
+                    </div>
+                    <div className="font-extrabold text-sm text-slate-900 mt-1">
+                      {day.tempMaxC}° <span className="text-slate-400 font-normal text-xs">/ {day.tempMinC}°</span>
+                    </div>
+                    <p className="text-[10px] text-slate-600 mt-1 line-clamp-2 leading-tight">
+                      {day.weatherDescription}
+                    </p>
+                  </div>
+
+                  <div className="mt-2.5 pt-2 border-t border-slate-200/60 space-y-1">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-500 flex items-center gap-0.5">
+                        <CloudRain className="w-3 h-3 text-blue-600" /> Rain:
+                      </span>
+                      <span className={`font-black ${isRainExpected ? 'text-blue-700' : 'text-slate-700'}`}>
+                        {day.precipitationSumMm} mm
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-slate-500 flex items-center gap-0.5">
+                        <Sun className="w-3 h-3 text-amber-600" /> ET₀:
+                      </span>
+                      <span className="font-semibold text-slate-700">
+                        {day.et0Mm} mm/d
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Proximity Ranked Station List Table */}
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">

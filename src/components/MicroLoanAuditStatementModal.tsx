@@ -152,24 +152,24 @@ export const MicroLoanAuditStatementModal: React.FC<Props> = ({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-800">
-                  REPUBLIC OF ZIMBABWE • SMALLHOLDER AGRIBUSINESS AUDIT
+                  FARMERS DICTIONARY ZW • SMALLHOLDER AGRIBUSINESS AUDIT
                 </div>
                 <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">
                   INPUT VS. YIELD FINANCIAL AUDIT STATEMENT
                 </h1>
                 <p className="text-xs text-slate-600 mt-1">
-                  Compliant with Agritex Standards & Micro-Loan Repayment Capacity Guidelines
+                  Smallholder Farm Business Records & Repayment Capacity Summary
                 </p>
               </div>
 
-              {/* Official Seal / Badge */}
+              {/* Verified Records Badge */}
               <div className="text-center shrink-0 border-2 border-emerald-800 bg-emerald-50 rounded-xl p-2.5 min-w-[130px]">
                 <ShieldCheck className="w-6 h-6 mx-auto text-emerald-800 mb-0.5" />
                 <div className="text-[9px] font-black uppercase text-emerald-950 tracking-wider">
-                  HURUDZA VERIFIED
+                  FARM AUDIT RECORD
                 </div>
                 <div className="text-[8px] text-emerald-800 font-mono">
-                  REF: ZW-AGR-{Date.now().toString().slice(-6)}
+                  REF: FDZ-REC-{Date.now().toString().slice(-6)}
                 </div>
               </div>
             </div>
@@ -268,25 +268,25 @@ export const MicroLoanAuditStatementModal: React.FC<Props> = ({
                 <tbody className="divide-y divide-slate-100">
                   <tr>
                     <td className="p-2.5 font-bold text-slate-800">Certified Seed</td>
-                    <td className="p-2.5 text-slate-600">Seed Co / Pannar Certified Hybrid</td>
+                    <td className="p-2.5 text-slate-600">Certified Hybrid Seed (Thiram/Metalaxyl treated)</td>
                     <td className="p-2.5 text-right font-semibold">${postHarvestInput.seedCostUsd.toFixed(2)}</td>
                     <td className="p-2.5 text-right text-slate-500 font-mono">ZiG {(postHarvestInput.seedCostUsd * 28.5).toFixed(2)}</td>
                   </tr>
                   <tr>
                     <td className="p-2.5 font-bold text-slate-800">Basal Fertilizer (Compound D)</td>
-                    <td className="p-2.5 text-slate-600">Windmill / ZFC 7:14:7 Basal placement</td>
+                    <td className="p-2.5 text-slate-600">Compound D (7:14:7) Basal placement</td>
                     <td className="p-2.5 text-right font-semibold">${postHarvestInput.compoundDFertilizerCostUsd.toFixed(2)}</td>
                     <td className="p-2.5 text-right text-slate-500 font-mono">ZiG {(postHarvestInput.compoundDFertilizerCostUsd * 28.5).toFixed(2)}</td>
                   </tr>
                   <tr>
                     <td className="p-2.5 font-bold text-slate-800">Top Dressing Fertilizer (AN)</td>
-                    <td className="p-2.5 text-slate-600">Sable Chemicals Ammonium Nitrate (34.5% N)</td>
+                    <td className="p-2.5 text-slate-600">Ammonium Nitrate (AN 34.5% N)</td>
                     <td className="p-2.5 text-right font-semibold">${postHarvestInput.anTopDressingCostUsd.toFixed(2)}</td>
                     <td className="p-2.5 text-right text-slate-500 font-mono">ZiG {(postHarvestInput.anTopDressingCostUsd * 28.5).toFixed(2)}</td>
                   </tr>
                   <tr>
                     <td className="p-2.5 font-bold text-slate-800">Agrochemicals & Protection</td>
-                    <td className="p-2.5 text-slate-600">Agricura Karate Zeon / Fungicide</td>
+                    <td className="p-2.5 text-slate-600">Karate Zeon / Fungicide</td>
                     <td className="p-2.5 text-right font-semibold">${postHarvestInput.chemicalsAgrochemicalsCostUsd.toFixed(2)}</td>
                     <td className="p-2.5 text-right text-slate-500 font-mono">ZiG {(postHarvestInput.chemicalsAgrochemicalsCostUsd * 28.5).toFixed(2)}</td>
                   </tr>
@@ -358,20 +358,20 @@ export const MicroLoanAuditStatementModal: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Section 5: Official Sign-Off & Verification Box */}
+          {/* Section 5: Farmer Self-Declaration & Agronomy Review */}
           <div className="border-t-2 border-slate-900 pt-5 mt-6 text-xs">
             <div className="grid grid-cols-2 gap-8">
-              {/* Agritex Extension Officer Box */}
+              {/* Farmer / Agronomy Technical Assessor Box */}
               <div className="space-y-4">
                 <span className="font-black text-slate-900 uppercase block tracking-wider">
-                  Agritex Ward Extension Officer Endorsement
+                  Lead Farmer / Farm Manager Self-Declaration
                 </span>
                 <p className="text-[11px] text-slate-500 leading-relaxed">
-                  I hereby verify that the above farmer implemented Pfumvudza conservation practices and the reported inputs and yields were inspected on-farm.
+                  I hereby certify that the above farm records accurately reflect the input application rates, seasonal management practices, and harvested yields achieved for the stated enterprise plot.
                 </p>
                 <div className="pt-6 border-b border-dashed border-slate-400 flex justify-between text-[11px] text-slate-400">
-                  <span>Signature & Date</span>
-                  <span>Agritex Stamp</span>
+                  <span>Borrower / Manager Signature</span>
+                  <span>Date & Phone</span>
                 </div>
               </div>
 
@@ -385,9 +385,14 @@ export const MicroLoanAuditStatementModal: React.FC<Props> = ({
                 </p>
                 <div className="pt-6 border-b border-dashed border-slate-400 flex justify-between text-[11px] text-slate-400">
                   <span>Credit Officer Signature</span>
-                  <span>Branch Approval Stamp</span>
+                  <span>Branch Stamp / Approval</span>
                 </div>
               </div>
+            </div>
+
+            {/* Legal Disclaimer */}
+            <div className="mt-5 p-2.5 bg-slate-100 rounded-lg text-[10px] text-slate-500 border border-slate-200">
+              <strong>Notice:</strong> This statement is an independent agribusiness record summary prepared using Farmers Dictionary Zw tools for farmer self-accounting and lender review. It is not an official government certificate or statutory endorsement.
             </div>
           </div>
         </div>
