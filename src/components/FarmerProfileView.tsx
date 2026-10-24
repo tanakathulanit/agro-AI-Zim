@@ -788,7 +788,7 @@ export const FarmerProfileView: React.FC<Props> = ({
                 value={profile.phoneNumber}
                 onChange={e => setProfile({ ...profile, phoneNumber: e.target.value })}
                 className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
-                placeholder="+263 77..."
+                placeholder="e.g. 077 123 4567"
               />
             </div>
 

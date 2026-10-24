@@ -681,7 +681,7 @@ export const YieldAndInputAnalysis: React.FC<Props> = ({
             </div>
 
             <div className="p-4 bg-slate-900 text-white rounded-xl text-xs leading-relaxed">
-              <span className="font-bold text-emerald-400 block mb-1">Extension Evaluation:</span>
+              <span className="font-bold text-emerald-400 block mb-1">Agronomy Evaluation:</span>
               {postHarvestCropResult.efficiencyAdvice}
             </div>
           </div>

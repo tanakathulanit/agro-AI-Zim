@@ -344,13 +344,13 @@ ${selectedMarket.topCommodities.slice(0, 2).map((c) => `• ${c.name}: ${c.price
 💡 *Umlayezo kwi-Market:* ${selectedMarket.ndebeleAdvisory}`;
     }
 
-    // Call To Action Section specifically pointing to the WhatsApp Hub
+    // Call To Action Section pointing to the WhatsApp Advisory & Web Tool
     const whatsAppCta = `━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📲 *CONNECT TO OUR 1-TAP WHATSAPP HUB:*
-Need 1-on-1 personalized advisory with a certified Agritex extension officer or want to join over ${selectedWhatsAppGroup.memberCount} in the *${selectedWhatsAppGroup.name}*?
-👉 Tap to chat or join our community: ${selectedWhatsAppGroup.defaultInviteLink}
+📲 *SHARE & DISCUSS VIA WHATSAPP:*
+Connect with fellow smallholder farmers in the *${selectedWhatsAppGroup.name}* (${selectedWhatsAppGroup.region}).
+Forward this advisory bulletin to your local ward farming groups and family networks!
 
-🌐 Explore the Trilingual Agricultural Dictionary & Live Diagnostic Scanner:
+🌐 Explore the Trilingual Agricultural Dictionary & Field Advisory:
 ${appUrl}`;
 
     // Assemble output based on languageMode

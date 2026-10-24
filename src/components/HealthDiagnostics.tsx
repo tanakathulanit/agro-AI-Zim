@@ -315,7 +315,7 @@ export const HealthDiagnostics: React.FC<Props> = ({
                 <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
                   Plant & Livestock Health Diagnostic System
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300">
-                    Live Agritex & EPPO Certified
+                    EPPO & Plant Pathology Reference Certified
                   </span>
                 </h3>
               </div>
@@ -406,7 +406,7 @@ export const HealthDiagnostics: React.FC<Props> = ({
                     </span>
                   </div>
                   <p className="text-xs text-slate-300 mt-0.5">
-                    Local smallholder farmers and Agritex extension wards reported pest/disease outbreaks near your location ({currentLocationName}).
+                    Local smallholder farmers and community agronomy networks reported pest/disease outbreaks near your location ({currentLocationName}).
                   </p>
                 </div>
               </div>
@@ -647,7 +647,7 @@ export const HealthDiagnostics: React.FC<Props> = ({
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4" />
-                    Diagnose & Generate Agritex Remedy
+                    Diagnose & Generate Agronomy Remedy
                   </>
                 )}
               </button>
@@ -827,12 +827,12 @@ export const HealthDiagnostics: React.FC<Props> = ({
                     </div>
                   )}
 
-                  {/* Agritex Extension Officer Guideline */}
+                  {/* Master Farmer & Agronomist Guideline */}
                   <div className="bg-slate-900 text-white rounded-xl p-3.5 text-xs flex items-start gap-3">
                     <Award className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                     <div>
                       <span className="font-bold text-emerald-300 block mb-0.5">
-                        Agritex Master Farmer Advisory:
+                        Master Farmer Agronomy Advisory:
                       </span>
                       <p className="text-slate-300 leading-relaxed">
                         {diagnosticResult.agritexAdvisoryNote}
@@ -987,7 +987,7 @@ export const HealthDiagnostics: React.FC<Props> = ({
                 Showing <strong>{filteredDatabaseRecords.length}</strong> verified pathology records
               </span>
               <span className="text-[11px] text-emerald-700 font-semibold">
-                Sourced from Agritex, Plant Quarantine Services, & EPPO Global Database
+                Sourced from Regional Plant Pathology Standards & EPPO Global Database
               </span>
             </div>
           </div>
@@ -1288,11 +1288,11 @@ export const HealthDiagnostics: React.FC<Props> = ({
                 </div>
               </div>
 
-              {/* Agritex Advisory */}
+              {/* Agronomy Advisory */}
               <div className="bg-slate-900 text-white rounded-xl p-3.5 flex items-start gap-2.5">
                 <Award className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold text-emerald-300 block mb-0.5">Agritex Official Guideline:</span>
+                  <span className="font-bold text-emerald-300 block mb-0.5">Agronomy Specialist Guideline:</span>
                   <p className="text-slate-300 leading-relaxed">
                     {inspectingRecord.agritexAdvisory}
                   </p>

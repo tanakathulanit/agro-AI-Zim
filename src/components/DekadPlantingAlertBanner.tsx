@@ -98,7 +98,7 @@ ${favorableCrops.map(c => `• ${c.profile.cropName} (${c.badgeLabel})`).join('\
 ${alertSummary.message}
 
 ━━━━━━━━━━━━━━━━━━━━━
-_Powered by Farmers Dictionary Zw • MSD & Agritex Telemetry_`;
+_Powered by Farmers Dictionary Zw • Agro-Met Telemetry_`;
 
     const encoded = encodeURIComponent(text.trim());
     window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank', 'noopener,noreferrer');
@@ -113,7 +113,7 @@ _Powered by Farmers Dictionary Zw • MSD & Agritex Telemetry_`;
           : 'Do not sow dry seed; finish digging 15x15x15cm basins and place kraal manure / compost blanket.',
         'Apply basal Compound D (or fertilizer per Soil Quality Assessment) into basins before seed placement.',
         'Apply 5-7cm dry grass/stover mulch blanket to prevent scorching and suppress early weed flushes.',
-        'Monitor local Agritex & Met Department bulletins daily for sudden 3-day dry spells.'
+        'Monitor local meteorological and agro-bulletins daily for sudden 3-day dry spells.'
       ];
 
       downloadDekadAdvisoryPDF({
@@ -482,7 +482,7 @@ _Powered by Farmers Dictionary Zw • MSD & Agritex Telemetry_`;
             <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-950 space-y-1">
               <span className="font-bold flex items-center gap-1.5 text-emerald-900">
                 <Sprout className="w-4 h-4 text-emerald-700" />
-                Agritex Sowing Directive:
+                Agronomic Sowing Advisory:
               </span>
               <p className="leading-relaxed">
                 {selectedCropModal.advisoryText}

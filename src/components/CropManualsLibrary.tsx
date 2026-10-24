@@ -145,11 +145,11 @@ export const CropManualsLibrary: React.FC<CropManualsLibraryProps> = ({
 • Spray Program Highlight: ${manual.sprayProgramHighlight}
 • Harvest Criteria: ${manual.harvestCriteria}
 
-💡 *Top Agritex & Agronomy Directives:*
+💡 *Best Practice Agronomy Directives:*
 ${manual.keyDirectives.map((d, i) => `${i + 1}. ${d}`).join('\n')}
 
 ━━━━━━━━━━━━━━━━━━━━━
-_Powered by Farmers Dictionary Zw • Official National Agronomy Standards_`;
+_Powered by Farmers Dictionary Zw • Independent Agronomy Standards_`;
 
     const shareUrl = buildWhatsAppUniversalShare(text);
     window.open(shareUrl, '_blank', 'noopener,noreferrer');
@@ -183,11 +183,11 @@ ${chem.targetPestsWeedsDiseases.map(p => `• ${p}`).join('\n')}
 • Pre-Harvest Interval (PHI): *${chem.preHarvestIntervalDays} days*
 • Re-Entry Interval: ${chem.reEntryIntervalHours} hours
 
-💡 *Agritex Field Advisory:*
+💡 *Agronomy Field Advisory:*
 ${chem.agritexFieldAdvisory}
 
 ━━━━━━━━━━━━━━━━━━━━━
-_Farmers Dictionary Zw • DR&SS Pesticides Regulations Act (Chapter 18:12)_`;
+_Farmers Dictionary Zw • Pesticides Reference & Safety Guidelines_`;
 
     const shareUrl = buildWhatsAppUniversalShare(text);
     window.open(shareUrl, '_blank', 'noopener,noreferrer');
@@ -232,7 +232,7 @@ _Farmers Dictionary Zw • DR&SS Pesticides Regulations Act (Chapter 18:12)_`;
               National Technical Repository
             </span>
             <span className="text-emerald-200/70 text-xs font-medium">
-              DR&SS Official Standards • National Agronomy Handbooks • Agritex Approved
+              Plant Protection Standards • National Agronomy Handbooks • Best Practice Guidelines
             </span>
           </div>
 
@@ -241,7 +241,7 @@ _Farmers Dictionary Zw • DR&SS Pesticides Regulations Act (Chapter 18:12)_`;
           </h2>
 
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            Direct access to official Zimbabwe technical crop production handbooks, agronomy standards, and the Ministry of Agriculture's DR&SS directory of registered pesticides, herbicides, fungicides, and veterinary remedies.
+            Direct access to practical Zimbabwe technical crop production handbooks, agronomy standards, and verified reference directories of registered pesticides, herbicides, fungicides, and veterinary remedies.
           </p>
 
           {/* Sub-view switcher */}
@@ -507,11 +507,11 @@ _Farmers Dictionary Zw • DR&SS Pesticides Regulations Act (Chapter 18:12)_`;
                     </div>
                   </div>
 
-                  {/* Key Agronomy Directives (Agritex Technical Standards) */}
+                  {/* Key Agronomy Directives */}
                   <div className="bg-emerald-50/80 border-l-4 border-emerald-600 rounded-r-2xl p-4 sm:p-5 space-y-2">
                     <div className="font-black text-xs uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
                       <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                      <span>Mandatory Technical Production Directives</span>
+                      <span>Recommended Technical Production Directives</span>
                     </div>
                     <ul className="space-y-1.5 text-xs text-slate-800 leading-relaxed">
                       {selectedManual.keyDirectives.map((directive, idx) => (
@@ -913,11 +913,11 @@ _Farmers Dictionary Zw • DR&SS Pesticides Regulations Act (Chapter 18:12)_`;
                     </div>
                   </div>
 
-                  {/* Agritex Field Advisory & Mode of Action */}
+                  {/* Agronomy Field Advisory & Mode of Action */}
                   <div className="bg-emerald-50/80 border-l-4 border-emerald-600 rounded-r-2xl p-4 sm:p-5 space-y-2">
                     <div className="font-black text-xs uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
                       <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                      <span>Agritex Extension Field Advisory</span>
+                      <span>Agronomy Extension Field Advisory</span>
                     </div>
                     <p className="text-xs text-slate-800 leading-relaxed">
                       {selectedChemical.agritexFieldAdvisory}

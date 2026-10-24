@@ -87,7 +87,7 @@ export const LocalWeatherStationsView: React.FC<Props> = ({
                   Zimbabwe Automated Weather Station (AWS) Network
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Real-time micro-climate telemetry from MSD Zimbabwe, Agritex Automated Stations & Research Centres.
+                  Real-time micro-climate telemetry from meteorological stations, agricultural observation points & research centres.
                 </p>
               </div>
             </div>

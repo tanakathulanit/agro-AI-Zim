@@ -703,22 +703,31 @@ function AppContent() {
         initialQuery={whatsAppModalQuery}
       />
 
-      {/* Footer with Zimbabwean Agricultural Reference Data */}
-      <footer className="bg-white border-t border-slate-200 mt-12 py-6 text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-slate-700 font-semibold">
-            <span>Farmers Dictionary Zw (farmers Dictionary Zw)</span>
-            <span className="text-slate-300">•</span>
-            <span className="text-slate-500 font-normal">
-              Supporting smallholder farmers across all 10 Zimbabwe Provinces • Connected to WhatsApp
-            </span>
+      {/* Footer with Zimbabwean Agricultural Reference Data & Legal Disclaimer */}
+      <footer className="bg-slate-900 text-slate-400 border-t border-slate-800 mt-12 py-8 text-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-slate-300">
+            <div className="flex items-center gap-2 font-bold text-sm text-emerald-400">
+              <span>🌾 Farmers Dictionary Zw</span>
+              <span className="text-slate-600">•</span>
+              <span className="text-slate-300 text-xs font-normal">
+                Independent Smallholder Agronomy Advisory & Educational Platform
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
+              <span>Pfumvudza / Intwasa Management</span>
+              <span>•</span>
+              <span>Open Agro-Met Telemetry</span>
+              <span>•</span>
+              <span>Wholesale Market Benchmarks</span>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-400">
-            <span>Conservation Agriculture (Pfumvudza / Intwasa)</span>
-            <span>Micro-Climate AWS Network</span>
-            <span>Offline-Ready PWA</span>
-            <span>GMB & Mbare Musika Pricing Index</span>
+          <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] text-slate-400 leading-relaxed">
+            <strong className="text-amber-400 uppercase tracking-wider block mb-1">
+              Legal Notice & Non-Affiliation Disclaimer:
+            </strong>
+            Farmers Dictionary Zw is an independent private educational and farm records platform. It is not affiliated with, authorized by, sponsored by, or an official agency of Agritex (Department of Agricultural Technical and Extension Services), the Ministry of Lands, Agriculture, Fisheries, Water and Rural Development, or any statutory board. All agronomic models, dosage rates, market estimates, and calculations are provided for informational and planning purposes only. Farmers should consult their local registered agricultural specialist or agrochemical label instructions before making critical commercial or application decisions.
           </div>
         </div>
       </footer>

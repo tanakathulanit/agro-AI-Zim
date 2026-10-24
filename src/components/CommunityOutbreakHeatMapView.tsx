@@ -423,7 +423,7 @@ export const CommunityOutbreakHeatMapView: React.FC<Props> = ({
               </div>
             </div>
             <p className="text-xs text-slate-600 max-w-3xl leading-relaxed">
-              Crowdsourced pathogen surveillance engine powered by verified smallholder farmers, Master Farmers, and Agritex field extension officers across all 10 provinces. Monitors spatial vectors, calculates proximity radii from your farm, and triggers immediate containment advisories.
+              Crowdsourced pathogen surveillance engine powered by verified smallholder farmers, Master Farmers, and qualified agronomy specialists across all 10 provinces. Monitors spatial vectors, calculates proximity radii from your farm, and triggers immediate containment advisories.
             </p>
           </div>
 
@@ -895,14 +895,14 @@ export const CommunityOutbreakHeatMapView: React.FC<Props> = ({
                 <div className="flex items-center justify-between font-bold text-emerald-950">
                   <span className="flex items-center gap-1.5">
                     <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                    {selectedReport.verifiedByAgritex ? 'Agritex Extension Verified' : 'Community Field Report'}
+                    {(selectedReport.verifiedBySpecialist || selectedReport.verifiedByAgritex) ? 'Agronomy Specialist Verified' : 'Community Field Report'}
                   </span>
                   <span className="text-[10px] text-emerald-800 font-normal">{selectedReport.reportedAt}</span>
                 </div>
                 <p className="text-emerald-900 text-[11px]">
                   Reported by <strong>{selectedReport.reportedBy}</strong> ({selectedReport.reporterRole})
-                  {selectedReport.agritexOfficerName && (
-                    <span> • Certified by <em>{selectedReport.agritexOfficerName}</em></span>
+                  {(selectedReport.specialistName || selectedReport.agritexOfficerName) && (
+                    <span> • Verified by <em>{selectedReport.specialistName || selectedReport.agritexOfficerName}</em></span>
                   )}
                 </p>
                 <div className="pt-1 flex items-center justify-between">
@@ -969,7 +969,7 @@ export const CommunityOutbreakHeatMapView: React.FC<Props> = ({
                 Click Any Outbreak Cluster on the Heat Map
               </h4>
               <p className="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto">
-                Select any glowing outbreak pin or cluster on the map to inspect full community input notes, Agritex verification credentials, proximity to your farm, and verified containment chemicals.
+                Select any glowing outbreak pin or cluster on the map to inspect full community input notes, specialist verification credentials, proximity to your farm, and verified containment chemicals.
               </p>
               <div className="pt-2">
                 <button
@@ -1032,7 +1032,7 @@ export const CommunityOutbreakHeatMapView: React.FC<Props> = ({
                   Report Field Outbreak (Community Input)
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Your report alerts surrounding smallholder farmers and Agritex officers to contain the spread.
+                  Your report alerts surrounding smallholder farmers and community agronomy specialists to contain the spread.
                 </p>
               </div>
               <button 
@@ -1202,7 +1202,7 @@ export const CommunityOutbreakHeatMapView: React.FC<Props> = ({
                   >
                     <option value="Smallholder Farmer">Smallholder Farmer</option>
                     <option value="Master Farmer">Master Farmer</option>
-                    <option value="Agritex Extension Officer">Agritex Extension Officer</option>
+                    <option value="Qualified Agronomist">Qualified Agronomist</option>
                     <option value="Veterinary Field Officer">Veterinary Field Officer</option>
                   </select>
                 </div>

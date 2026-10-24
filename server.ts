@@ -63,7 +63,7 @@ const getLatestMarketData = () => {
       },
       {
         id: 'gmb-depot',
-        name: 'GMB (Grain Marketing Board) Statutory Prices',
+        name: 'GMB (Grain Marketing Board) Indicative Baseline Prices',
         location: 'National Depots',
         commodities: [
           { name: 'Maize Grade A', unit: 'Metric Tonne', priceUsd: 335.00, prevPriceUsd: 335.00, demand: 'Guaranteed Buyer', supply: 'National', trend: 'stable' },
@@ -126,7 +126,7 @@ app.get('/api/pests-diseases', (req, res) => {
       success: true,
       totalCount: results.length,
       databaseSize: REAL_PEST_DISEASE_DATABASE.length,
-      source: 'Agritex & EPPO Certified Zimbabwe Database',
+      source: 'Plant Pathology & EPPO Reference Database',
       data: results,
     });
   } catch (err: unknown) {
@@ -161,7 +161,7 @@ app.post('/api/diagnostics/analyze', async (req, res) => {
     const cleanBase64 = imageBase64.replace(/^data:image\/\w+;base64,/, '');
 
     const promptText = `
-You are a senior Agronomist and Veterinary Specialist serving smallholder farmers in Zimbabwe for Agritex and the Department of Veterinary Services.
+You are an expert independent Agronomist and Veterinary Specialist serving smallholder farmers in Zimbabwe for Farmers Dictionary Zw.
 You are inspecting an uploaded image of a ${targetType} (${cropOrAnimal}) from a smallholder farm in ${location}.
 Farmer's observations: "${notes || 'Observed visual symptoms on farm'}".
 
@@ -311,7 +311,7 @@ app.get('/api/outbreaks', (req, res) => {
       success: true,
       totalCount: results.length,
       allReportsCount: communityOutbreaksStore.length,
-      source: 'Verified Local Community Smallholder & Agritex Network',
+      source: 'Verified Local Community Smallholder & Field Agronomy Network',
       data: results
     });
   } catch (err: unknown) {
@@ -405,7 +405,7 @@ app.post('/api/advisory/ask', async (req, res) => {
     }
 
     const promptText = `
-You are the "Agritex Master Agro-Advisor", an expert on smallholder agriculture in Zimbabwe.
+You are the "Farmers Dictionary Zw Master Agro-Advisor", an expert on smallholder agriculture in Zimbabwe.
 You provide precise, practical, and highly localized advice covering:
 - Zimbabwe Agro-Ecological Natural Farming Regions I, IIa, IIb, III, IV, and V.
 - Conservation agriculture (Pfumvudza/Intwasa hole digging, mulch, spacing 75cm x 60cm, basal Compound D, top dressing Ammonium Nitrate AN).
@@ -439,7 +439,7 @@ Provide a structured, authoritative yet friendly response in English with releva
     }
 
     // Heuristic response
-    let answer = `**Agritex Master Advisory Response:**\n\nFor smallholder farmers in Zimbabwe, success hinges on moisture conservation and timely input application.\n\n` +
+    let answer = `**Farmers Dictionary Master Advisory Response:**\n\nFor smallholder farmers in Zimbabwe, success hinges on moisture conservation and timely input application.\n\n` +
       `1. **Pfumvudza / Intwasa Precision:** Ensure your planting basins (15cm deep x 15cm wide) have received at least 25-30mm of cumulative rainfall within a 3-day window before sowing seed to prevent false germination.\n` +
       `2. **Fertilizer Protocol:** Apply 1 standard beer-bottle-cap of Compound D (7:14:7) per station as basal dressing covered by 2cm of soil. Top dress with Ammonium Nitrate (AN 34.5% N) at knee height (4-6 weeks after emergence) right after rain when the soil is damp.\n` +
       `3. **Pest Scouting:** Scout twice weekly for Fall Armyworm (Mhungu). Spray Agricura Karate Zeon or apply wood ash in the whorl upon first detection of pinhole leaf damage.\n` +
@@ -475,7 +475,7 @@ let facebookConfig: ServerFacebookConfig = {
   pageAccessToken: process.env.FACEBOOK_PAGE_ACCESS_TOKEN || '',
   pageName: 'Farmers Dictionary Zimbabwe',
   pageUrl: 'https://www.facebook.com/1312589948614022',
-  category: 'Agricultural Community & Agritex Advisory Service',
+  category: 'Agricultural Community & Farming Knowledge Service',
   fanCount: 14850,
   pictureUrl: 'https://images.unsplash.com/photo-1595855759920-86582396756a?auto=format&fit=crop&w=200&q=80',
   isConnected: true, // Connected to user's Facebook Page
@@ -1314,7 +1314,7 @@ Current Market Benchmarks: White Maize $14.50/50kg, Soya Beans $580/tonne, Tomat
 If type is 'post':
 Write an engaging post with:
 - Catchy hook with emojis
-- Clear bullet points with practical Agritex advice or verified prices
+- Clear bullet points with practical agronomy advice or verified prices
 - An interactive question prompting farmers to comment (e.g., asking their district or pricing)
 - 4-6 relevant Zimbabwean agriculture hashtags (#Pfumvudza #MbareMusika #ZimbabweFarming etc.)
 
@@ -1322,7 +1322,7 @@ If type is 'reel':
 Write:
 1. Title
 2. Caption & Hashtags
-3. 3-4 sequential slide scenes (Slide 1: Problem/Hook 0-10s, Slide 2: Practical Agritex Step 10-25s, Slide 3: Demonstration 25-45s, Slide 4: Call to Action).
+3. 3-4 sequential slide scenes (Slide 1: Problem/Hook 0-10s, Slide 2: Practical Agronomy Step 10-25s, Slide 3: Demonstration 25-45s, Slide 4: Call to Action).
 
 Respond strictly with valid JSON in this format:
 {
@@ -1355,7 +1355,7 @@ Respond strictly with valid JSON in this format:
     // Heuristic generator fallback
     const fallbackContent = {
       title: `${topic || 'Zimbabwe Smallholder Weekly Update'}`,
-      content: `🌱 *FARMERS DICTIONARY ZW • FIELD BULLETIN* 🌱\n━━━━━━━━━━━━━━━━━━━━━\n${topic || 'Mastering Pfumvudza Basins & Seasonal Moisture'}\n\n💡 *Agritex Recommendation:*\n• Dig 15cm x 15cm basins along 75cm row spacings\n• Place 1 bottle cap of Compound D under 2cm of soil\n• Keep mulch intact to prevent dry spell evaporation!\n\n💬 *Question for Farmers:* What district are you farming in, and how are soil moisture levels today? Drop your town below! 👇\n\n#Pfumvudza #ZimAgriculture #FarmersDictionaryZw #MbareMusika #AgriTips`,
+      content: `🌱 *FARMERS DICTIONARY ZW • FIELD BULLETIN* 🌱\n━━━━━━━━━━━━━━━━━━━━━\n${topic || 'Mastering Pfumvudza Basins & Seasonal Moisture'}\n\n💡 *Agronomy Recommendation:*\n• Dig 15cm x 15cm basins along 75cm row spacings\n• Place 1 bottle cap of Compound D under 2cm of soil\n• Keep mulch intact to prevent dry spell evaporation!\n\n💬 *Question for Farmers:* What district are you farming in, and how are soil moisture levels today? Drop your town below! 👇\n\n#Pfumvudza #ZimAgriculture #FarmersDictionaryZw #MbareMusika #AgriTips`,
       hashtags: ['#Pfumvudza', '#ZimAgriculture', '#FarmersDictionaryZw', '#MbareMusika', '#AgriTips'],
       callToAction: 'Check the Farmers Dictionary Zw app for full technical directives'
     };
@@ -1387,7 +1387,7 @@ async function startServer() {
   }
 
   app.listen(port, () => {
-    console.log(`[Agritex Agro Server] Running on http://localhost:${port} (prod: ${isProd})`);
+    console.log(`[Farmers Dictionary Zw Server] Running on http://localhost:${port} (prod: ${isProd})`);
   });
 }
 

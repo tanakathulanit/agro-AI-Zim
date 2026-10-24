@@ -203,7 +203,7 @@ export const MarketPriceDiscovery: React.FC<Props> = ({ currentLocationName }) =
           <Coins className="w-3.5 h-3.5 text-amber-600" />
           <span>Official Benchmark Rate: 1.00 USD = {rate.toFixed(2)} ZiG</span>
           <span className="text-slate-300">•</span>
-          <span>Last MSD/Agritex sync: {marketData ? new Date(marketData.lastUpdated).toLocaleDateString() : 'Today'}</span>
+          <span>Last wholesale market sync: {marketData ? new Date(marketData.lastUpdated).toLocaleDateString() : 'Today'}</span>
         </div>
       </div>
 
@@ -324,7 +324,7 @@ export const MarketPriceDiscovery: React.FC<Props> = ({ currentLocationName }) =
           </h4>
         </div>
         <p className="text-xs text-slate-600 mb-5 max-w-3xl">
-          Should you sell to local village traders at farmgate, deliver to statutory GMB depots, or hire haulage transport to wholesale markets (Mbare / Renkini)? Enter your volume and road distance to see the exact net in pocket.
+          Should you sell to local village traders at farmgate, deliver to national grain depots (GMB), or hire haulage transport to wholesale markets (Mbare / Renkini)? Enter your volume and road distance to see the exact net in pocket.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -439,7 +439,7 @@ export const MarketPriceDiscovery: React.FC<Props> = ({ currentLocationName }) =
                   {formatPrice(gmbNet)}
                 </td>
                 <td className="p-3 text-slate-500">
-                  {isGrain ? 'Statutory guaranteed floor buyer for white maize & small grains.' : 'Contract buyer pricing.'}
+                  {isGrain ? 'National grain depot indicative baseline buyer for white maize & small grains.' : 'Contract buyer pricing.'}
                 </td>
               </tr>
             </tbody>

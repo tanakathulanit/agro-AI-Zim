@@ -68,7 +68,7 @@ export const TRANSLATIONS = {
     tab_geofence: '6. Livestock Geo-Fencing',
     tab_market: '7. Market Price Discovery',
     tab_forum: '8. Community Forum (Dare)',
-    tab_advisor: '9. Extension Officer AI',
+    tab_advisor: '9. Farm Agronomist AI',
     tab_soil: '10. Soil Quality Assessment',
     tab_dictionary: '11. Farmers Dictionary & WhatsApp',
     tab_manuals: '12. Crop Manuals & Registered Chemicals',

@@ -20,103 +20,142 @@ export interface DictionaryEntry {
   tags: string[];
 }
 
-export interface WhatsAppCommunityGroup {
+export interface WhatsAppCommunityNetwork {
   id: string;
   name: string;
   region: string;
   focus: string;
   memberCount: string;
   description: string;
-  defaultInviteLink: string;
-  agritexModerator: string;
+  sampleBroadcast: string;
 }
 
-export const WHATSAPP_COMMUNITY_GROUPS: WhatsAppCommunityGroup[] = [
+export const WHATSAPP_COMMUNITY_NETWORKS: WhatsAppCommunityNetwork[] = [
   {
     id: 'pfumvudza-national',
-    name: 'Pfumvudza / Intwasa National Champions',
+    name: 'Pfumvudza / Intwasa Community Network',
     region: 'National (Regions I - V)',
     focus: 'Basin preparation, mulching, hole spacing, and zero-tillage yields',
-    memberCount: '1,024+ Farmers',
-    description: 'Official national community sharing daily basin digging benchmarks, manure placement rates, and early sowing alerts across Zimbabwe.',
-    defaultInviteLink: 'https://chat.whatsapp.com/invite/pfumvudza-champions-zw',
-    agritexModerator: 'Agritex National Conservation Agronomist'
+    memberCount: 'Conservation Agriculture',
+    description: 'Community knowledge sharing for standard 15x15x15cm basins, manure placement rates, and early sowing alerts across Zimbabwe.',
+    sampleBroadcast: `🌱 *PFUMVUDZA / INTWASA FIELD BULLETIN*
+• Ensure minimum 25mm soaking rain before seeding basins.
+• Standard basin spacing: 75cm between rows x 60cm within row (or 75x75cm).
+• Maintain 100% mulch cover to conserve root-zone soil moisture.
+_Shared via Farmers Dictionary Zw_`
   },
   {
     id: 'mash-maize-soya',
-    name: 'Mashonaland High-Yield Maize & Soya Hub',
+    name: 'Mashonaland High-Yield Cropping Network',
     region: 'Region IIa & IIb (Goromonzi, Mazowe, Chinhoyi, Marondera)',
     focus: 'Commercial & smallholder hybrid maize, top-dressing splits, FAW scouting',
-    memberCount: '890+ Farmers',
+    memberCount: 'High Rainfall Cropping',
     description: 'Focused on high-rainfall cropping systems, SC719/PAN53 hybrids, lime applications, and grain drying protocols.',
-    defaultInviteLink: 'https://chat.whatsapp.com/invite/mashonaland-agro-zw',
-    agritexModerator: 'Mashonaland Provincial Crops Officer'
+    sampleBroadcast: `🌽 *MASHONALAND CROPPING BULLETIN*
+• Scout for Fall Armyworm in 20 plants across field diagonals.
+• Apply split AN top-dressing following effective rainfall events.
+• Ensure grain moisture reaches <12.5% before storage.
+_Shared via Farmers Dictionary Zw_`
   },
   {
     id: 'manicaland-horticulture',
-    name: 'Manicaland Highlands & Honde Valley Farmers',
+    name: 'Manicaland Highlands & Honde Valley Network',
     region: 'Region I & II (Mutare, Nyanga, Chipinge, Chimanimani)',
     focus: 'Avocados, macadamia, tea, coffee, potato blight, drip irrigation',
-    memberCount: '670+ Farmers',
+    memberCount: 'Horticulture & Plantations',
     description: 'Specialized agro-climatic discussions for mountainous high-rainfall farmers dealing with acidic soils and cold-season horticultural crops.',
-    defaultInviteLink: 'https://chat.whatsapp.com/invite/manicaland-farmers-zw',
-    agritexModerator: 'Eastern Highlands Horticulture Specialist'
+    sampleBroadcast: `🥑 *MANICALAND HORTICULTURE BULLETIN*
+• Inspect seed potato and tomato crops for early and late blight after misty spells.
+• Check drip line emitters and test soil acidity for lime requirement.
+_Shared via Farmers Dictionary Zw_`
   },
   {
     id: 'midlands-masvingo-grains',
     name: 'Midlands & Masvingo Small Grains Network',
     region: 'Region III & IV (Gweru, Gokwe, Masvingo, Chivi, Gutu)',
     focus: 'Sorghum (SVT1), Pearl millet, cowpeas, dead-level contours',
-    memberCount: '940+ Farmers',
+    memberCount: 'Drought-Hardy Grains',
     description: 'Climate-resilient dryland farming methods, water harvesting in semi-arid velds, and drought mitigation protocols.',
-    defaultInviteLink: 'https://chat.whatsapp.com/invite/midlands-masvingo-zw',
-    agritexModerator: 'Dryland Farming Extension Lead'
+    sampleBroadcast: `🌾 *MIDLANDS & MASVINGO GRAINS BULLETIN*
+• Prioritize drought-resilient varieties: SVT1 Sorghum, Pearl Millet, and Nyemba.
+• Dig tied ridges and dead-level contours to harvest runoff water.
+_Shared via Farmers Dictionary Zw_`
   },
   {
     id: 'matabeleland-livestock',
-    name: 'Matabeleland Cattle & Livestock Guild',
+    name: 'Matabeleland Cattle & Livestock Network',
     region: 'Region IV & V (Bulawayo, Lupane, Gwanda, Beitbridge, Plumtree)',
     focus: 'Boran & Tuli cattle, dipping schedules, tick-borne disease, bush encroachment',
-    memberCount: '810+ Farmers',
-    description: 'Veterinary support network focusing on preventing Theileriosis (January Disease), lumpy skin, drought supplementary feeding, and goat breeding.',
-    defaultInviteLink: 'https://chat.whatsapp.com/invite/matabeleland-livestock-zw',
-    agritexModerator: 'Department of Veterinary Services (DVS) Lead'
+    memberCount: 'Rangeland & Livestock',
+    description: 'Livestock management network focusing on preventing Theileriosis (January Disease), lumpy skin, drought supplementary feeding, and goat breeding.',
+    sampleBroadcast: `🐂 *MATABELELAND LIVESTOCK BULLETIN*
+• Maintain regular dipping interval (5-5-4 during high tick pressure months).
+• Provide drought supplementary protein licks and inspect for lumpy skin lesions.
+_Shared via Farmers Dictionary Zw_`
   },
   {
     id: 'peri-urban-market-gardeners',
-    name: 'Peri-Urban Market Gardeners (Mbare & Renkini)',
+    name: 'Peri-Urban Market Gardeners Network',
     region: 'Urban & Peri-Urban (Harare, Bulawayo, Chitungwiza)',
     focus: 'Tomatoes, brassicas, onions, direct fresh pricing, pest management',
-    memberCount: '1,200+ Farmers',
+    memberCount: 'Fresh Produce Markets',
     description: 'Real-time market price updates from Mbare Musika and Renkini, cabbage glut alerts, and cold storage negotiation tips.',
-    defaultInviteLink: 'https://chat.whatsapp.com/invite/peri-urban-market-zw',
-    agritexModerator: 'Horticultural Marketing Board Liaison'
+    sampleBroadcast: `🥬 *PERI-URBAN MARKET BULLETIN*
+• Check wholesale produce movement and plan harvests for early morning dispatch.
+• Coordinate joint crate transport with neighboring growers to minimize costs.
+_Shared via Farmers Dictionary Zw_`
   }
 ];
 
-export const AGRITEX_OFFICIAL_HOTLINES = [
+export interface AdvisoryTopicOption {
+  id: string;
+  title: string;
+  category: string;
+  prompt: string;
+}
+
+export const ADVISORY_TOPIC_OPTIONS: AdvisoryTopicOption[] = [
   {
-    name: 'Agritex National Farmer Advisory Helpdesk',
-    number: '263772100254',
-    display: '+263 77 210 0254',
-    badge: 'Official WhatsApp Helpdesk',
-    hours: '24/7 Agro-Advisory'
+    id: 'planting-rain',
+    title: 'Sowing Window & Dekad Rain',
+    category: 'Field Preparation',
+    prompt: 'Basin moisture depth and seed variety suitability for current rainfall onset'
   },
   {
-    name: 'Department of Veterinary Services (DVS) Alert Line',
-    number: '263712004821',
-    display: '+263 71 200 4821',
-    badge: 'Livestock & Tick Disease',
-    hours: '06:00 - 20:00 Daily'
+    id: 'pfumvudza-basins',
+    title: 'Pfumvudza Basins & Mulch Protocol',
+    category: 'Conservation Agriculture',
+    prompt: 'Standard 15x15x15cm basin digging spacing, manure placement, and mulch coverage'
   },
   {
-    name: 'Zimbabwe Farmers Union (ZFU) Support Desk',
-    number: '263773449102',
-    display: '+263 77 344 9102',
-    badge: 'Input Subsidies & Markets',
-    hours: '08:00 - 17:00 Mon-Sat'
+    id: 'fertilizer-dosing',
+    title: 'Fertilizer Dosing (Compound D & AN Splits)',
+    category: 'Soil Nutrition',
+    prompt: 'Compound D bottle-cap basal dosage and Ammonium Nitrate top-dressing timing'
+  },
+  {
+    id: 'pest-diagnosis',
+    title: 'Pest / Disease Diagnosis',
+    category: 'Crop Protection',
+    prompt: 'Fall armyworm scouting, stalk borer prevention, or potato foliage blight'
+  },
+  {
+    id: 'livestock-dipping',
+    title: 'Livestock Dipping & Tick Prevention',
+    category: 'Animal Health',
+    prompt: 'Dipping schedules (5-5-4 cycle), tick-borne January Disease, and supplementary licks'
+  },
+  {
+    id: 'market-delivery',
+    title: 'Grain Delivery & Moisture Requirements',
+    category: 'Post-Harvest & Marketing',
+    prompt: 'Grain moisture meter threshold (<12.5%), storage bags, and transport arrangements'
   }
 ];
+
+// Backwards compatibility alias
+export type WhatsAppCommunityGroup = WhatsAppCommunityNetwork;
+export const WHATSAPP_COMMUNITY_GROUPS = WHATSAPP_COMMUNITY_NETWORKS;
 
 export const FARMERS_DICTIONARY_ENTRIES: DictionaryEntry[] = [
   {
@@ -346,12 +385,14 @@ export const FARMERS_DICTIONARY_ENTRIES: DictionaryEntry[] = [
 ];
 
 /**
- * Format a WhatsApp Click-to-Chat URL
+ * Format a WhatsApp Click-to-Chat URL or Universal Share if phone is omitted
  */
-export function buildWhatsAppLink(phoneNumber: string, message: string): string {
-  // Strip non-digits
-  const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
+export function buildWhatsAppLink(phoneNumber?: string, message: string = ''): string {
+  const cleanPhone = (phoneNumber || '').replace(/[^0-9]/g, '');
   const encodedMsg = encodeURIComponent(message.trim());
+  if (!cleanPhone) {
+    return `https://api.whatsapp.com/send?text=${encodedMsg}`;
+  }
   return `https://wa.me/${cleanPhone}?text=${encodedMsg}`;
 }
 
@@ -374,17 +415,17 @@ export function generateWhatsAppInquiryMessage(options: {
   queryDetails?: string;
 }): string {
   const { topic, districtName, naturalRegion, farmerName, queryDetails } = options;
-  return `🌾 *FARMERS DICTIONARY ZW • AGRITEX ADVISORY INQUIRY*
+  return `🌾 *FARMERS DICTIONARY ZW • FIELD ADVISORY INQUIRY*
 ━━━━━━━━━━━━━━━━━━━━━
 📍 *District:* ${districtName} (Natural Region ${naturalRegion})
 👤 *Farmer:* ${farmerName || 'Smallholder Farmer'}
 📌 *Topic:* ${topic}
 
 📝 *Field Query:*
-${queryDetails || 'Please assist with Agritex verified advisory for our local conditions, planting timing, and input rates.'}
+${queryDetails || 'Please assist with agronomic advisory for our local conditions, planting timing, and input rates.'}
 
 ━━━━━━━━━━━━━━━━━━━━━
-_Sent via Farmers Dictionary Zw System_`;
+_Sent via Farmers Dictionary Zw App_`;
 }
 
 /**
@@ -421,5 +462,5 @@ export function generateWhatsAppDailyDigest(district: {
 
 ━━━━━━━━━━━━━━━━━━━━━
 _Share this digest to your local farmer WhatsApp group!_
-_Powered by Farmers Dictionary Zw • Agritex Verified_`;
+_Powered by Farmers Dictionary Zw • Agro-Climatic Advisory Guide_`;
 }
