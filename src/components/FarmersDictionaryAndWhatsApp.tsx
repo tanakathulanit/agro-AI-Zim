@@ -19,16 +19,25 @@ import {
   Layers, 
   ShieldCheck, 
   FileText, 
-  QrCode,
-  Tag,
-  Bookmark,
-  Mic,
-  MicOff,
-  Volume2,
-  AlertCircle,
-  X,
-  ChevronDown,
-  Globe
+  QrCode, 
+  Tag, 
+  Bookmark, 
+  Mic, 
+  MicOff, 
+  Volume2, 
+  AlertCircle, 
+  X, 
+  ChevronDown, 
+  Globe,
+  Database,
+  HardDrive,
+  Wifi,
+  WifiOff,
+  History,
+  Trash2,
+  Clock,
+  DownloadCloud,
+  CheckCircle2
 } from 'lucide-react';
 import { ZimbabweLocation } from '../data/zimbabweLocations';
 import { 
@@ -41,6 +50,20 @@ import {
   generateWhatsAppInquiryMessage,
   generateWhatsAppDailyDigest
 } from '../data/farmersDictionaryData';
+import { 
+  cacheDictionaryTerm,
+  cacheDictionaryTermsBatch,
+  getCachedDictionaryTerms,
+  removeCachedDictionaryTerm,
+  clearAllCachedTerms,
+  recordSearchHistory,
+  getRecentSearches,
+  removeSearchHistoryItem,
+  clearAllSearchHistory,
+  CachedDictionaryEntry,
+  SearchHistoryItem,
+  isIndexedDBAvailable
+} from '../utils/dictionaryIndexedDB';
 import { useLanguage } from '../context/LanguageContext';
 
 export interface VoiceLanguageOption {
@@ -87,6 +110,17 @@ export const VOICE_LANGUAGES: VoiceLanguageOption[] = [
   }
 ];
 
+function formatTimeAgo(timestamp: number): string {
+  const diffSec = Math.floor((Date.now() - timestamp) / 1000);
+  if (diffSec < 60) return 'just now';
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHours = Math.floor(diffMin / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays}d ago`;
+}
+
 interface FarmersDictionaryAndWhatsAppProps {
   currentLocation: ZimbabweLocation;
   onOpenWhatsAppModal: (topic?: string, query?: string) => void;
@@ -102,6 +136,43 @@ export const FarmersDictionaryAndWhatsApp: React.FC<FarmersDictionaryAndWhatsApp
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedRegionFilter, setSelectedRegionFilter] = useState<string>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // IndexedDB Offline Cache & Search History States
+  const [cachedTerms, setCachedTerms] = useState<CachedDictionaryEntry[]>([]);
+  const [recentSearches, setRecentSearches] = useState<SearchHistoryItem[]>([]);
+  const [isOffline, setIsOffline] = useState<boolean>(() => typeof navigator !== 'undefined' ? !navigator.onLine : false);
+  const [cacheNotice, setCacheNotice] = useState<string | null>(null);
+  const [isBatchCaching, setIsBatchCaching] = useState<boolean>(false);
+  const searchDebounceRef = useRef<any>(null);
+
+  // Load IndexedDB data & register network connectivity listeners
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    // Initial load of cached terms and recent searches
+    loadOfflineData();
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  const loadOfflineData = async () => {
+    try {
+      const [terms, searches] = await Promise.all([
+        getCachedDictionaryTerms(),
+        getRecentSearches(10)
+      ]);
+      setCachedTerms(terms);
+      setRecentSearches(searches);
+    } catch (err) {
+      console.warn('Failed to load offline data:', err);
+    }
+  };
 
   // Web Speech API Voice Search States
   const [isListening, setIsListening] = useState<boolean>(false);
@@ -255,9 +326,10 @@ export const FarmersDictionaryAndWhatsApp: React.FC<FarmersDictionaryAndWhatsApp
     setInterimTranscript('');
   };
 
-  // Term categories
+  // Term categories (including offline saved entries from IndexedDB)
   const categories = [
     { id: 'all', label: 'All Terms', count: FARMERS_DICTIONARY_ENTRIES.length },
+    { id: 'offline_cached', label: `💾 Offline Saved (${cachedTerms.length})`, count: cachedTerms.length },
     { id: 'Pfumvudza', label: 'Pfumvudza / Intwasa' },
     { id: 'Soil & Water', label: 'Soil & Water' },
     { id: 'Crops & Grains', label: 'Crops & Grains' },
@@ -266,11 +338,13 @@ export const FarmersDictionaryAndWhatsApp: React.FC<FarmersDictionaryAndWhatsApp
     { id: 'Markets & Economics', label: 'Markets & Economics' }
   ];
 
-  // Filter dictionary entries
+  // Filter dictionary entries (from all terms or from on-device IndexedDB cache)
   const filteredEntries = useMemo(() => {
-    return FARMERS_DICTIONARY_ENTRIES.filter((entry) => {
-      // Category filter
-      if (selectedCategory !== 'all' && entry.category !== selectedCategory) {
+    const source = selectedCategory === 'offline_cached' ? cachedTerms : FARMERS_DICTIONARY_ENTRIES;
+
+    return source.filter((entry) => {
+      // Category filter (if not 'all' and not 'offline_cached')
+      if (selectedCategory !== 'all' && selectedCategory !== 'offline_cached' && entry.category !== selectedCategory) {
         return false;
       }
 
@@ -299,9 +373,89 @@ export const FarmersDictionaryAndWhatsApp: React.FC<FarmersDictionaryAndWhatsApp
 
       return true;
     });
-  }, [searchQuery, selectedCategory, selectedRegionFilter]);
+  }, [searchQuery, selectedCategory, selectedRegionFilter, cachedTerms]);
+
+  // Debounced search recording in IndexedDB
+  useEffect(() => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+
+    const trimmed = searchQuery.trim();
+    if (trimmed.length >= 2) {
+      searchDebounceRef.current = setTimeout(async () => {
+        try {
+          await recordSearchHistory(trimmed, filteredEntries.length, selectedCategory, selectedRegionFilter);
+          const updatedSearches = await getRecentSearches(10);
+          setRecentSearches(updatedSearches);
+        } catch {
+          // ignore
+        }
+      }, 750);
+    }
+
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    };
+  }, [searchQuery, filteredEntries.length, selectedCategory, selectedRegionFilter]);
+
+  // Touch / Cache term in IndexedDB
+  const handleTouchTerm = async (entry: DictionaryEntry) => {
+    try {
+      await cacheDictionaryTerm(entry);
+      const updated = await getCachedDictionaryTerms();
+      setCachedTerms(updated);
+    } catch {
+      // ignore
+    }
+  };
+
+  // Batch cache all dictionary terms for 100% offline access
+  const handleBatchCacheAll = async () => {
+    setIsBatchCaching(true);
+    try {
+      const count = await cacheDictionaryTermsBatch(FARMERS_DICTIONARY_ENTRIES);
+      const updated = await getCachedDictionaryTerms();
+      setCachedTerms(updated);
+      setCacheNotice(`✅ Successfully saved all ${count} dictionary terms to IndexedDB storage for 100% offline access!`);
+      setTimeout(() => setCacheNotice(null), 5000);
+    } catch (err) {
+      setCacheNotice('Failed to cache terms for offline.');
+    } finally {
+      setIsBatchCaching(false);
+    }
+  };
+
+  const handleRemoveCachedTerm = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await removeCachedDictionaryTerm(id);
+      const updated = await getCachedDictionaryTerms();
+      setCachedTerms(updated);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleClearHistory = async () => {
+    try {
+      await clearAllSearchHistory();
+      setRecentSearches([]);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleDeleteSearchItem = async (id: string) => {
+    try {
+      await removeSearchHistoryItem(id);
+      const updated = await getRecentSearches(10);
+      setRecentSearches(updated);
+    } catch {
+      // ignore
+    }
+  };
 
   const handleShareTermToWhatsApp = (entry: DictionaryEntry) => {
+    handleTouchTerm(entry);
     const text = `📖 *FARMERS DICTIONARY ZW • AGRONOMIC ENTRY*
 ━━━━━━━━━━━━━━━━━━━━━
 🌱 *Term:* ${entry.term}
@@ -323,6 +477,7 @@ _Shared from Farmers Dictionary Zw App_`;
   };
 
   const handleCopyTerm = (entry: DictionaryEntry) => {
+    handleTouchTerm(entry);
     const text = `Farmers Dictionary Zw: ${entry.term} (${entry.shona} / ${entry.ndebele}) - ${entry.definitionEn} | Agritex Recommendation: ${entry.agritexRecommendation}`;
     navigator.clipboard.writeText(text);
     setCopiedId(entry.id);
@@ -330,6 +485,7 @@ _Shared from Farmers Dictionary Zw App_`;
   };
 
   const handleAskAboutTerm = (entry: DictionaryEntry) => {
+    handleTouchTerm(entry);
     onOpenWhatsAppModal(
       `Clarification on ${entry.term}`,
       `Mhoroi / Salibonani! I am reading the Farmers Dictionary Zw entry for "${entry.term}" (${entry.shona}). How does this specifically apply to my fields in ${currentLocation.name} (Region ${currentLocation.naturalRegion})?`
@@ -554,6 +710,90 @@ _Shared from Farmers Dictionary Zw App_`;
               </div>
             </div>
 
+            {/* Offline Mode Active Banner */}
+            {isOffline && (
+              <div className="bg-amber-50 border border-amber-300 text-amber-950 rounded-2xl p-3 text-xs flex items-center justify-between gap-2 shadow-xs">
+                <div className="flex items-center gap-2">
+                  <WifiOff className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span className="font-semibold">
+                    Offline Mode Active: Serving dictionary terms and search history from on-device IndexedDB storage.
+                  </span>
+                </div>
+                <span className="text-[10px] bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-full shrink-0">
+                  {cachedTerms.length} Cached Terms
+                </span>
+              </div>
+            )}
+
+            {/* Cache Action Notification */}
+            {cacheNotice && (
+              <div className="bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-2xl p-3 text-xs flex items-center justify-between gap-2 shadow-xs animate-in fade-in">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+                  <span className="font-semibold">{cacheNotice}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCacheNotice(null)}
+                  className="text-emerald-700 hover:text-emerald-950 p-1 rounded-lg"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            {/* Recent Search History Chips (from IndexedDB) */}
+            {recentSearches.length > 0 && (
+              <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2 text-xs">
+                <div className="flex items-center gap-1 text-[11px] font-bold text-slate-500 shrink-0">
+                  <History className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Recent Searches:</span>
+                </div>
+                <div className="flex items-center gap-1.5 flex-wrap flex-1">
+                  {recentSearches.slice(0, 8).map((s) => (
+                    <div
+                      key={s.id}
+                      className="inline-flex items-center gap-1 bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 px-2.5 py-0.5 rounded-xl text-[11px] font-semibold transition border border-slate-200/80 group"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery(s.query);
+                          if (s.categoryFilter) setSelectedCategory(s.categoryFilter);
+                          if (s.regionFilter) setSelectedRegionFilter(s.regionFilter);
+                        }}
+                        className="cursor-pointer"
+                        title={`Re-run search for "${s.query}"`}
+                      >
+                        <span>{s.query}</span>
+                        {s.matchedCount > 0 && (
+                          <span className="text-[10px] text-slate-400 font-mono ml-1">({s.matchedCount})</span>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteSearchItem(s.id);
+                        }}
+                        className="text-slate-400 hover:text-rose-600 transition ml-0.5"
+                        title="Delete from search history"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={handleClearHistory}
+                    className="text-[10px] font-bold text-slate-400 hover:text-rose-600 underline ml-1 cursor-pointer"
+                  >
+                    Clear history
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Active Voice Search Listening Tray */}
             {isListening && (
               <div className="bg-gradient-to-r from-rose-50 via-amber-50/50 to-emerald-50 border-2 border-rose-400/60 rounded-2xl p-4 shadow-md space-y-3 animate-in fade-in duration-200">
@@ -682,139 +922,223 @@ _Shared from Farmers Dictionary Zw App_`;
             </div>
           </div>
 
-          {/* Results Summary */}
-          <div className="flex items-center justify-between text-xs text-slate-500 px-1">
-            <span>
-              Showing <strong>{filteredEntries.length}</strong> agricultural terms 
-              {selectedCategory !== 'all' ? ` in ${selectedCategory}` : ''}
-              {selectedRegionFilter !== 'all' ? ` for Region ${selectedRegionFilter}` : ''}
-            </span>
+          {/* Results Summary & Offline Device Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-slate-500 px-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span>
+                Showing <strong>{filteredEntries.length}</strong> agricultural terms 
+                {selectedCategory === 'offline_cached' ? ' saved on device' : selectedCategory !== 'all' ? ` in ${selectedCategory}` : ''}
+                {selectedRegionFilter !== 'all' ? ` for Region ${selectedRegionFilter}` : ''}
+              </span>
+              {selectedCategory === 'offline_cached' && cachedTerms.length > 0 && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await clearAllCachedTerms();
+                    setCachedTerms([]);
+                  }}
+                  className="text-[11px] text-rose-600 hover:text-rose-800 underline font-semibold cursor-pointer ml-1"
+                >
+                  Clear offline storage
+                </button>
+              )}
+            </div>
 
-            <span className="text-emerald-800 font-semibold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-              <span>Every term includes 1-tap WhatsApp sharing</span>
-            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleBatchCacheAll}
+                disabled={isBatchCaching}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold transition shadow-2xs cursor-pointer disabled:opacity-50"
+                title="Store all terms in on-device IndexedDB storage for offline reading in the fields"
+              >
+                <DownloadCloud className="w-3.5 h-3.5 text-emerald-700" />
+                <span>
+                  {isBatchCaching 
+                    ? 'Saving to IndexedDB...' 
+                    : cachedTerms.length >= FARMERS_DICTIONARY_ENTRIES.length
+                    ? 'All Terms Saved Offline' 
+                    : `Save All (${FARMERS_DICTIONARY_ENTRIES.length}) for Offline`}
+                </span>
+              </button>
+            </div>
           </div>
 
           {/* Dictionary Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredEntries.map((entry) => (
-              <div
-                key={entry.id}
-                className="bg-white rounded-3xl border border-slate-200/90 hover:border-emerald-300 p-5 shadow-xs hover:shadow-md transition flex flex-col justify-between space-y-4 group"
-              >
-                <div className="space-y-3">
-                  {/* Top Badges */}
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 uppercase tracking-wide">
-                      {entry.category}
-                    </span>
+            {filteredEntries.map((entry) => {
+              const cachedItem = cachedTerms.find(c => c.id === entry.id);
+              const isCached = !!cachedItem;
 
-                    <div className="flex items-center gap-1">
-                      {entry.applicableRegions.map((reg) => (
-                        <span
-                          key={reg}
-                          className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200"
-                        >
-                          R-{reg}
+              return (
+                <div
+                  key={entry.id}
+                  onClick={() => handleTouchTerm(entry)}
+                  className="bg-white rounded-3xl border border-slate-200/90 hover:border-emerald-300 p-5 shadow-xs hover:shadow-md transition flex flex-col justify-between space-y-4 group cursor-pointer"
+                >
+                  <div className="space-y-3">
+                    {/* Top Badges */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 uppercase tracking-wide">
+                          {entry.category}
                         </span>
-                      ))}
-                    </div>
-                  </div>
 
-                  {/* Term Title & Vernacular Translations */}
-                  <div>
-                    <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-emerald-800 transition">
-                      {entry.term}
-                    </h3>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-slate-600">
-                      <span className="inline-flex items-center gap-1 font-medium">
-                        <span className="font-bold text-amber-700">ChiShona:</span> {entry.shona}
-                      </span>
-                      <span className="text-slate-300">•</span>
-                      <span className="inline-flex items-center gap-1 font-medium">
-                        <span className="font-bold text-blue-700">SiNdebele:</span> {entry.ndebele}
-                      </span>
-                    </div>
-                  </div>
+                        {isCached && (
+                          <span className="inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <HardDrive className="w-2.5 h-2.5 text-emerald-600" />
+                            <span>Saved Offline</span>
+                          </span>
+                        )}
 
-                  {/* Plain Language Definition */}
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                    {language === 'sn' ? entry.definitionSn : language === 'nd' ? entry.definitionNd : entry.definitionEn}
-                  </p>
+                        {selectedCategory === 'offline_cached' && cachedItem && (
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            Viewed {cachedItem.viewCount}x • {formatTimeAgo(cachedItem.lastAccessedAt)}
+                          </span>
+                        )}
+                      </div>
 
-                  {/* Agritex Field Recommendation Box */}
-                  <div className="bg-emerald-50/70 border-l-4 border-emerald-600 rounded-r-2xl p-3 text-xs text-emerald-950 space-y-1">
-                    <div className="font-bold text-emerald-900 flex items-center gap-1.5">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-                      <span>Agritex Field Protocol:</span>
+                      <div className="flex items-center gap-1">
+                        {selectedCategory === 'offline_cached' && (
+                          <button
+                            type="button"
+                            onClick={(e) => handleRemoveCachedTerm(entry.id, e)}
+                            className="p-1 text-slate-400 hover:text-rose-600 rounded-lg transition"
+                            title="Remove from offline cache"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+
+                        {entry.applicableRegions.map((reg) => (
+                          <span
+                            key={reg}
+                            className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200"
+                          >
+                            R-{reg}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <p className="text-slate-700 leading-normal">
-                      {entry.agritexRecommendation}
+
+                    {/* Term Title & Vernacular Translations */}
+                    <div>
+                      <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-emerald-800 transition">
+                        {entry.term}
+                      </h3>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-slate-600">
+                        <span className="inline-flex items-center gap-1 font-medium">
+                          <span className="font-bold text-amber-700">ChiShona:</span> {entry.shona}
+                        </span>
+                        <span className="text-slate-300">•</span>
+                        <span className="inline-flex items-center gap-1 font-medium">
+                          <span className="font-bold text-blue-700">SiNdebele:</span> {entry.ndebele}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Plain Language Definition */}
+                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                      {language === 'sn' ? entry.definitionSn : language === 'nd' ? entry.definitionNd : entry.definitionEn}
                     </p>
-                  </div>
-                </div>
 
-                {/* Card Action Footer with WhatsApp Integration */}
-                <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    {/* Share to WhatsApp */}
-                    <button
-                      onClick={() => handleShareTermToWhatsApp(entry)}
-                      className="px-3 py-1.5 bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-xs"
-                      title="Share this dictionary term directly to WhatsApp"
-                    >
-                      <Share2 className="w-3.5 h-3.5" />
-                      <span>Share to WhatsApp</span>
-                    </button>
-
-                    {/* Ask on WhatsApp */}
-                    <button
-                      onClick={() => handleAskAboutTerm(entry)}
-                      className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold rounded-xl transition flex items-center gap-1"
-                      title="Ask Agritex extension officer on WhatsApp about this term"
-                    >
-                      <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
-                      <span>Ask Officer</span>
-                    </button>
+                    {/* Agritex Field Recommendation Box */}
+                    <div className="bg-emerald-50/70 border-l-4 border-emerald-600 rounded-r-2xl p-3 text-xs text-emerald-950 space-y-1">
+                      <div className="font-bold text-emerald-900 flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                        <span>Agritex Field Protocol:</span>
+                      </div>
+                      <p className="text-slate-700 leading-normal">
+                        {entry.agritexRecommendation}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Copy Text */}
-                  <button
-                    onClick={() => handleCopyTerm(entry)}
-                    className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg transition"
-                    title="Copy definition"
-                  >
-                    {copiedId === entry.id ? (
-                      <Check className="w-4 h-4 text-emerald-600" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </button>
+                  {/* Card Action Footer with WhatsApp Integration */}
+                  <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      {/* Share to WhatsApp */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleShareTermToWhatsApp(entry);
+                        }}
+                        className="px-3 py-1.5 bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-xs"
+                        title="Share this dictionary term directly to WhatsApp"
+                      >
+                        <Share2 className="w-3.5 h-3.5" />
+                        <span>Share to WhatsApp</span>
+                      </button>
+
+                      {/* Ask on WhatsApp */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAskAboutTerm(entry);
+                        }}
+                        className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold rounded-xl transition flex items-center gap-1"
+                        title="Ask extension officer on WhatsApp about this term"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5 text-emerald-700" />
+                        <span>Ask Officer</span>
+                      </button>
+                    </div>
+
+                    {/* Copy Text */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopyTerm(entry);
+                      }}
+                      className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg transition"
+                      title="Copy definition"
+                    >
+                      {copiedId === entry.id ? (
+                        <Check className="w-4 h-4 text-emerald-600" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {filteredEntries.length === 0 && (
             <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 space-y-3">
-              <div className="text-4xl">🌾</div>
+              <div className="text-4xl">{selectedCategory === 'offline_cached' ? '💾' : '🌾'}</div>
               <h3 className="font-bold text-base text-slate-800">
-                No dictionary terms match your search
+                {selectedCategory === 'offline_cached' 
+                  ? 'No terms in your on-device offline storage yet' 
+                  : 'No dictionary terms match your search'}
               </h3>
               <p className="text-xs text-slate-500 max-w-md mx-auto">
-                Try searching in English, ChiShona, or SiNdebele, or clear the category and region filters.
+                {selectedCategory === 'offline_cached'
+                  ? 'Whenever you browse, search, or share agricultural terms, they are automatically saved to your on-device IndexedDB cache. You can also tap below to save all terms now.'
+                  : 'Try searching in English, ChiShona, or SiNdebele, or clear the category and region filters.'}
               </p>
-              <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setSelectedCategory('all');
-                  setSelectedRegionFilter('all');
-                }}
-                className="px-4 py-2 bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs"
-              >
-                Reset All Filters
-              </button>
+              {selectedCategory === 'offline_cached' ? (
+                <button
+                  onClick={handleBatchCacheAll}
+                  disabled={isBatchCaching}
+                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs transition inline-flex items-center gap-2 cursor-pointer"
+                >
+                  <DownloadCloud className="w-4 h-4" />
+                  <span>{isBatchCaching ? 'Saving in IndexedDB...' : 'Save All Terms to Device Storage Now'}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCategory('all');
+                    setSelectedRegionFilter('all');
+                  }}
+                  className="px-4 py-2 bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs"
+                >
+                  Reset All Filters
+                </button>
+              )}
             </div>
           )}
         </div>
