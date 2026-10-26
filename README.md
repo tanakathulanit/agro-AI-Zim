@@ -133,7 +133,29 @@ This repository contains a production-ready `netlify.toml`:
 
 ---
 
-### 3. Deploy to Docker / Google Cloud Run / Render
+### 3. Deploy to Google Firebase Hosting (Named URL e.g. `farmers-dictionary-zw.web.app`)
+Google Firebase Hosting gives you an instant, branded URL in your app's name (`<your-project-id>.web.app` and `<your-project-id>.firebaseapp.com`), plus free custom domain binding (`farmersdictionary.co.zw`):
+
+1. **Install Firebase CLI & Login** (if not already installed):
+   ```bash
+   npm install -g firebase-tools
+   firebase login
+   ```
+2. **Build the production web app**:
+   ```bash
+   npm run build
+   ```
+3. **Deploy to Firebase Hosting**:
+   ```bash
+   firebase deploy --only hosting
+   ```
+4. **Custom Domain (Optional)**:
+   - In the [Firebase Console](https://console.firebase.google.com), open **Hosting > Add custom domain**.
+   - Connect your own domain (e.g. `farmersdictionary.com` or `farmersdictionary.co.zw`) with free automatic SSL.
+
+---
+
+### 4. Deploy to Docker / Google Cloud Run / Render
 ```dockerfile
 FROM node:20-alpine
 WORKDIR /app
