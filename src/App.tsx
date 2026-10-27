@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { 
   ZIMBABWE_LOCATIONS, 
   ZimbabweLocation 
@@ -12,23 +12,40 @@ import {
   MASTER_CROPS, 
   CropRecommendation 
 } from './data/agronomyData';
-import { CropRecommendationEngine } from './components/CropRecommendationEngine';
-import { PlantingHarvestPlanner } from './components/PlantingHarvestPlanner';
-import { LocalWeatherStationsView } from './components/LocalWeatherStationsView';
-import { YieldAndInputAnalysis } from './components/YieldAndInputAnalysis';
-import { HealthDiagnostics } from './components/HealthDiagnostics';
-import { GeoFencingMonitor } from './components/GeoFencingMonitor';
-import { MarketPriceDiscovery } from './components/MarketPriceDiscovery';
-import { CommunityForum } from './components/CommunityForum';
-import { AgritexAssistant } from './components/AgritexAssistant';
-import { SoilQualityAssessment } from './components/SoilQualityAssessment';
-import { FarmersDictionaryAndWhatsApp } from './components/FarmersDictionaryAndWhatsApp';
-import { CropManualsLibrary } from './components/CropManualsLibrary';
-import { FarmerProfileView } from './components/FarmerProfileView';
-import { FacebookPageHub } from './components/FacebookPageHub';
+
+// Senior Architecture: Code-Split & Lazy load all 14 heavy modules to optimize load times on mobile 3G networks
+const CropRecommendationEngine = lazy(() => import('./components/CropRecommendationEngine').then(m => ({ default: m.CropRecommendationEngine })));
+const PlantingHarvestPlanner = lazy(() => import('./components/PlantingHarvestPlanner').then(m => ({ default: m.PlantingHarvestPlanner })));
+const LocalWeatherStationsView = lazy(() => import('./components/LocalWeatherStationsView').then(m => ({ default: m.LocalWeatherStationsView })));
+const YieldAndInputAnalysis = lazy(() => import('./components/YieldAndInputAnalysis').then(m => ({ default: m.YieldAndInputAnalysis })));
+const HealthDiagnostics = lazy(() => import('./components/HealthDiagnostics').then(m => ({ default: m.HealthDiagnostics })));
+const GeoFencingMonitor = lazy(() => import('./components/GeoFencingMonitor').then(m => ({ default: m.GeoFencingMonitor })));
+const MarketPriceDiscovery = lazy(() => import('./components/MarketPriceDiscovery').then(m => ({ default: m.MarketPriceDiscovery })));
+const CommunityForum = lazy(() => import('./components/CommunityForum').then(m => ({ default: m.CommunityForum })));
+const AgritexAssistant = lazy(() => import('./components/AgritexAssistant').then(m => ({ default: m.AgritexAssistant })));
+const SoilQualityAssessment = lazy(() => import('./components/SoilQualityAssessment').then(m => ({ default: m.SoilQualityAssessment })));
+const FarmersDictionaryAndWhatsApp = lazy(() => import('./components/FarmersDictionaryAndWhatsApp').then(m => ({ default: m.FarmersDictionaryAndWhatsApp })));
+const CropManualsLibrary = lazy(() => import('./components/CropManualsLibrary').then(m => ({ default: m.CropManualsLibrary })));
+const FarmerProfileView = lazy(() => import('./components/FarmerProfileView').then(m => ({ default: m.FarmerProfileView })));
+const FacebookPageHub = lazy(() => import('./components/FacebookPageHub').then(m => ({ default: m.FacebookPageHub })));
+const SystemHealthDashboard = lazy(() => import('./components/SystemHealthDashboard').then(m => ({ default: m.SystemHealthDashboard })));
+
+const ModuleLoadingSkeleton = () => (
+  <div className="w-full space-y-4 animate-pulse py-8">
+    <div className="h-9 bg-slate-200/80 rounded-2xl w-1/3"></div>
+    <div className="h-44 bg-slate-200/70 rounded-3xl w-full"></div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="h-28 bg-slate-200/60 rounded-2xl"></div>
+      <div className="h-28 bg-slate-200/60 rounded-2xl"></div>
+      <div className="h-28 bg-slate-200/60 rounded-2xl"></div>
+    </div>
+  </div>
+);
 import { WhatsAppConnectModal } from './components/WhatsAppConnectModal';
 import { PWAInstallButton } from './components/PWAInstallButton';
 import { OfflineManagerBanner } from './components/OfflineManagerBanner';
+import { UssdTerminalSimulator } from './components/UssdTerminalSimulator';
+import { TransparencyDocumentModal } from './components/TransparencyDocumentModal';
 import { WeatherAlertsNotificationCenter } from './components/WeatherAlertsNotificationCenter';
 import { 
   Sprout, 
@@ -54,8 +71,14 @@ import {
   LogOut,
   ShieldCheck,
   Lock,
-  Crown,
-  Sparkles
+  Sparkles,
+  Menu,
+  X,
+  Grid,
+  ChevronRight,
+  Server,
+  Phone,
+  ArrowLeft
 } from 'lucide-react';
 import { StationWithDistance, getStationsRankedByProximity } from './data/weatherStations';
 import { useDekadPlantingAlert } from './hooks/useDekadPlantingAlert';
@@ -63,6 +86,7 @@ import { DekadPlantingAlertBanner } from './components/DekadPlantingAlertBanner'
 import { LanguageProvider, useTranslation } from './context/LanguageContext';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { LoginPage, AuthUser } from './components/LoginPage';
+import { PublicWebsite } from './components/PublicWebsite';
 
 function AppContent() {
   const { t } = useTranslation();
@@ -80,8 +104,16 @@ function AppContent() {
     return null;
   });
 
+  // Dual-Tier Architecture State: 'website' (Public Landing & Marketing) vs 'app' (Interactive Advisory Engine)
+  const [currentView, setCurrentView] = useState<'website' | 'app'>('website');
+
   const [selectedLocationId, setSelectedLocationId] = useState<string>('goromonzi');
-  const [activeNavTab, setActiveNavTab] = useState<'crops' | 'planner' | 'weather' | 'yield' | 'health' | 'geofence' | 'market' | 'forum' | 'advisor' | 'soil' | 'dictionary' | 'manuals' | 'profile' | 'facebook'>('crops');
+  const [activeNavTab, setActiveNavTab] = useState<'crops' | 'planner' | 'weather' | 'yield' | 'health' | 'geofence' | 'market' | 'forum' | 'advisor' | 'soil' | 'dictionary' | 'manuals' | 'profile' | 'facebook' | 'telemetry'>('crops');
+  const [isUssdOpen, setIsUssdOpen] = useState<boolean>(false);
+  const [transparencyModal, setTransparencyModal] = useState<{ isOpen: boolean; doc: 'terms' | 'privacy' | 'ussd' }>({
+    isOpen: false,
+    doc: 'terms'
+  });
   const [preselectedCropForYield, setPreselectedCropForYield] = useState<CropRecommendation | undefined>(undefined);
   const [preselectedCropForPlanner, setPreselectedCropForPlanner] = useState<CropRecommendation | undefined>(undefined);
   const [farmerProfileContext, setFarmerProfileContext] = useState<string | undefined>(undefined);
@@ -89,6 +121,7 @@ function AppContent() {
   const [isOnline, setIsOnline] = useState<boolean>(() => 
     typeof navigator !== 'undefined' ? navigator.onLine : true
   );
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   // Check if current authenticated user is developer
   const isDeveloper = currentUser?.role === 'developer';
@@ -263,37 +296,85 @@ function AppContent() {
     setActiveNavTab('planner');
   };
 
-  // ==================== AUTHENTICATION GATE ====================
-  // If user is not authenticated, render dedicated Agritex Login Page
-  if (!currentUser) {
-    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+  const handleLaunchApp = (targetTab?: string) => {
+    if (targetTab) {
+      setActiveNavTab(targetTab as any);
+    }
+    setCurrentView('app');
+  };
+
+  const handleOpenSignIn = () => {
+    setCurrentView('app');
+  };
+
+  // ==================== TIER 1: THE PUBLIC WEBSITE (THE FRONT DOOR) ====================
+  // The default landing experience for all visitors with real photography & marketing showcases
+  if (currentView === 'website') {
+    return (
+      <>
+        <PublicWebsite
+          onLaunchApp={handleLaunchApp}
+          onOpenSignIn={handleOpenSignIn}
+          onOpenUssd={() => setIsUssdOpen(true)}
+          onOpenTransparency={(doc) => setTransparencyModal({ isOpen: true, doc })}
+        />
+
+        {/* 2G Feature Phone USSD Terminal Simulator Modal */}
+        <UssdTerminalSimulator 
+          isOpen={isUssdOpen} 
+          onClose={() => setIsUssdOpen(false)} 
+        />
+
+        {/* Transparency & Legal Governance Modal */}
+        <TransparencyDocumentModal
+          isOpen={transparencyModal.isOpen}
+          initialDoc={transparencyModal.doc}
+          onClose={() => setTransparencyModal(prev => ({ ...prev, isOpen: false }))}
+        />
+      </>
+    );
   }
 
+  // ==================== TIER 2: ADVISORY WEB APPLICATION GATE ====================
+  // If user is not authenticated, render dedicated Login Page with Back to Website action
+  if (!currentUser) {
+    return (
+      <LoginPage 
+        onLoginSuccess={handleLoginSuccess}
+        onBackToWebsite={() => setCurrentView('website')}
+      />
+    );
+  }
+
+  const isAgritexOfficer = currentUser?.role === 'agritex_officer';
+  const isEnterpriseStaff = isDeveloper || isAgritexOfficer;
+
   // ==================== SYSTEM PAGES ARCHITECTURE ====================
-  // Define all 14 system pages with page numbers
+  // Define all system pages with role-based routing
   const ALL_SYSTEM_PAGES = [
-    { id: 'crops', label: t('tab_crops'), icon: Sprout, pageNum: 1, isDevOnly: false },
-    { id: 'planner', label: t('tab_planner'), icon: CalendarRange, pageNum: 2, isDevOnly: false },
-    { id: 'weather', label: t('tab_weather'), icon: Activity, pageNum: 3, isDevOnly: false },
-    { id: 'yield', label: t('tab_yield'), icon: TrendingUp, pageNum: 4, isDevOnly: false },
-    { id: 'health', label: t('tab_health'), icon: Camera, pageNum: 5, isDevOnly: false },
-    { id: 'geofence', label: t('tab_geofence'), icon: Radio, pageNum: 6, isDevOnly: false },
-    { id: 'market', label: t('tab_market'), icon: Store, pageNum: 7, isDevOnly: false },
-    { id: 'forum', label: t('tab_forum'), icon: Users, pageNum: 8, isDevOnly: false },
-    { id: 'advisor', label: t('tab_advisor'), icon: Bot, pageNum: 9, isDevOnly: false },
-    { id: 'soil', label: t('tab_soil'), icon: Layers, pageNum: 10, isDevOnly: false },
-    { id: 'dictionary', label: t('tab_dictionary'), icon: BookOpen, pageNum: 11, isDevOnly: false },
-    { id: 'manuals', label: t('tab_manuals'), icon: FlaskConical, pageNum: 12, isDevOnly: false },
-    { id: 'profile', label: t('tab_profile'), icon: UserCheck, pageNum: 13, isDevOnly: false },
-    { id: 'facebook', label: 'Page 14: Facebook Hub', icon: Share2, pageNum: 14, isDevOnly: true },
+    { id: 'crops', label: t('tab_crops'), icon: Sprout, pageNum: 1, isDevOnly: false, isEnterpriseOnly: false },
+    { id: 'planner', label: t('tab_planner'), icon: CalendarRange, pageNum: 2, isDevOnly: false, isEnterpriseOnly: false },
+    { id: 'weather', label: t('tab_weather'), icon: Activity, pageNum: 3, isDevOnly: false, isEnterpriseOnly: false },
+    { id: 'yield', label: t('tab_yield'), icon: TrendingUp, pageNum: 4, isDevOnly: false, isEnterpriseOnly: false },
+    { id: 'health', label: t('tab_health'), icon: Camera, pageNum: 5, isDevOnly: false, isEnterpriseOnly: false },
+    { id: 'geofence', label: t('tab_geofence'), icon: Radio, pageNum: 6, isDevOnly: false, isEnterpriseOnly: false },
+    { id: 'market', label: t('tab_market'), icon: Store, pageNum: 7, isDevOnly: false, isEnterpriseOnly: false },
+    { id: 'forum', label: t('tab_forum'), icon: Users, pageNum: 8, isDevOnly: false, isEnterpriseOnly: false },
+    { id: 'advisor', label: t('tab_advisor'), icon: Bot, pageNum: 9, isDevOnly: false, isEnterpriseOnly: false },
+    { id: 'soil', label: t('tab_soil'), icon: Layers, pageNum: 10, isDevOnly: false, isEnterpriseOnly: false },
+    { id: 'dictionary', label: t('tab_dictionary'), icon: BookOpen, pageNum: 11, isDevOnly: false, isEnterpriseOnly: false },
+    { id: 'manuals', label: t('tab_manuals'), icon: FlaskConical, pageNum: 12, isDevOnly: false, isEnterpriseOnly: false },
+    { id: 'profile', label: t('tab_profile'), icon: UserCheck, pageNum: 13, isDevOnly: false, isEnterpriseOnly: false },
+    { id: 'facebook', label: 'Page 14: Facebook Hub', icon: Share2, pageNum: 14, isDevOnly: true, isEnterpriseOnly: false },
+    { id: 'telemetry', label: 'Operations & Telemetry', icon: Server, pageNum: 15, isDevOnly: false, isEnterpriseOnly: true },
   ] as const;
 
-  // Intelligent Role Filtering:
-  // - If regular user (non-developer): strictly EXCLUDE Page 14 (total 13 pages)
-  // - If developer: INCLUDE Page 14 (total 14 pages)
-  const visiblePages = isDeveloper
-    ? ALL_SYSTEM_PAGES
-    : ALL_SYSTEM_PAGES.filter((p) => !p.isDevOnly);
+  // Intelligent Role Filtering
+  const visiblePages = ALL_SYSTEM_PAGES.filter((p) => {
+    if (p.id === 'facebook') return isDeveloper;
+    if (p.id === 'telemetry') return isEnterpriseStaff;
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-slate-100/60 text-slate-900 flex flex-col">
@@ -322,10 +403,11 @@ function AppContent() {
 
       {/* Main App Navigation Bar */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+        {/* DESKTOP HEADER (>= 768px) */}
+        <div className="hidden md:flex max-w-7xl mx-auto px-4 sm:px-6 py-3.5 items-center justify-between gap-4">
           {/* Logo & Identity */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-800 to-emerald-600 text-white flex items-center justify-center font-black text-xl shadow-md border border-emerald-500/30">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-800 to-emerald-600 text-white flex items-center justify-center font-black text-xl shadow-md border border-emerald-500/30 shrink-0">
               🌾
             </div>
             <div>
@@ -345,6 +427,17 @@ function AppContent() {
 
           {/* Location Selector, GPS, User Profile & Logout */}
           <div className="flex items-center gap-2 flex-wrap">
+            {/* Return to Public Website */}
+            <button
+              onClick={() => setCurrentView('website')}
+              className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0"
+              title="Return to Public Website"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden lg:inline">Public Website</span>
+              <span className="lg:hidden">Website</span>
+            </button>
+
             {/* Language Switcher */}
             <LanguageSwitcher />
 
@@ -370,7 +463,7 @@ function AppContent() {
               onClick={handleDetectGps}
               disabled={isGpsLocating}
               title={t('gps_detect')}
-              className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+              className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
             >
               <Compass className={`w-3.5 h-3.5 ${isGpsLocating ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">{isGpsLocating ? t('gps_locating') : t('gps_detect')}</span>
@@ -383,7 +476,7 @@ function AppContent() {
               title="Connect to Agricultural WhatsApp Helpline & Communities"
             >
               <MessageSquare className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">WhatsApp</span>
+              <span>WhatsApp</span>
               <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
             </button>
 
@@ -394,17 +487,34 @@ function AppContent() {
               distanceKm={closestStation.distanceKm}
             />
 
+            {/* 2G Feature Phone USSD Simulator Button */}
+            <button
+              onClick={() => setIsUssdOpen(true)}
+              className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-black transition flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0"
+              title="Launch Econet / NetOne 2G USSD (*144#) Terminal Simulator"
+            >
+              <Phone className="w-3.5 h-3.5 text-emerald-400" />
+              <span>*144# USSD</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            </button>
+
             {/* PWA In-App Install Button */}
             <PWAInstallButton />
 
-            {/* Authenticated User Role Badge & Logout */}
+            {/* Authenticated User Enterprise Role Badge & Logout */}
             <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-2xs">
               <div
                 className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${
-                  isDeveloper ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+                  isDeveloper
+                    ? 'bg-indigo-100 text-indigo-800'
+                    : isAgritexOfficer
+                    ? 'bg-amber-100 text-amber-800'
+                    : currentUser.role === 'commercial_buyer'
+                    ? 'bg-teal-100 text-teal-800'
+                    : 'bg-emerald-100 text-emerald-800'
                 }`}
               >
-                {isDeveloper ? '👑' : '🌾'}
+                {isDeveloper ? '💻' : isAgritexOfficer ? '🛡️' : currentUser.role === 'commercial_buyer' ? '📈' : '🌾'}
               </div>
               <div className="hidden sm:block text-left pr-1">
                 <span className="text-xs font-black text-slate-800 block leading-tight truncate max-w-[130px]">
@@ -412,10 +522,22 @@ function AppContent() {
                 </span>
                 <span
                   className={`text-[10px] font-bold block leading-tight ${
-                    isDeveloper ? 'text-amber-700' : 'text-emerald-700'
+                    isDeveloper
+                      ? 'text-indigo-700'
+                      : isAgritexOfficer
+                      ? 'text-amber-700'
+                      : currentUser.role === 'commercial_buyer'
+                      ? 'text-teal-700'
+                      : 'text-emerald-700'
                   }`}
                 >
-                  {isDeveloper ? 'Developer (14 Pgs)' : 'Farmer (13 Pgs)'}
+                  {isDeveloper
+                    ? 'Lead Systems Admin'
+                    : isAgritexOfficer
+                    ? `Agritex (${currentUser.badgeNumber || 'AGR-ZW'})`
+                    : currentUser.role === 'commercial_buyer'
+                    ? 'Produce Buyer'
+                    : `Master Farmer (${currentUser.badgeNumber || 'ZCFU'})`}
                 </span>
               </div>
               <button
@@ -429,8 +551,102 @@ function AppContent() {
           </div>
         </div>
 
-        {/* Dynamic System Page Tabs: 13 Pages for Farmers, 14 Pages for Developer */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        {/* MOBILE HEADER (< 768px: Streamlined 2-tier header) */}
+        <div className="md:hidden px-3.5 py-2.5 flex flex-col gap-2">
+          {/* Mobile Tier 1: Logo & Quick Global Actions */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-800 to-emerald-600 text-white flex items-center justify-center font-black text-base shadow-sm shrink-0">
+                🌾
+              </div>
+              <div className="truncate">
+                <div className="flex items-center gap-1.5">
+                  <h1 className="font-extrabold text-sm text-slate-900 tracking-tight truncate">
+                    {t('app_title')}
+                  </h1>
+                </div>
+                <span className="text-[10px] text-emerald-700 font-bold block leading-none">
+                  {currentUser.name.split(' ')[0]} • {isDeveloper ? 'Dev (14 Pgs)' : 'Farmer (13 Pgs)'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              {/* Weather alerts bell */}
+              <WeatherAlertsNotificationCenter 
+                closestStation={closestStation}
+                currentLocation={currentLocation}
+                distanceKm={closestStation.distanceKm}
+              />
+
+              {/* Return to Public Website */}
+              <button
+                onClick={() => setCurrentView('website')}
+                className="p-1.5 bg-slate-900 text-emerald-300 rounded-xl text-[11px] font-bold flex items-center gap-1 shrink-0"
+                title="Return to Public Website"
+              >
+                <ArrowLeft className="w-3 h-3 text-emerald-400" />
+                <span className="text-[10px]">Site</span>
+              </button>
+
+              {/* Language Switcher */}
+              <LanguageSwitcher />
+
+              {/* All Modules / User Drawer trigger */}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl transition flex items-center gap-1 font-bold text-xs"
+                title="View All Modules"
+                aria-label="Open Modules Menu"
+              >
+                <Grid className="w-4 h-4 text-emerald-700" />
+                <span className="text-[11px] font-black">{isDeveloper ? '14' : '13'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Tier 2: Location selector + GPS + WhatsApp in a single compact row */}
+          <div className="flex items-center gap-1.5">
+            <div className="relative flex-1 min-w-0">
+              <select
+                value={selectedLocationId}
+                onChange={(e) => setSelectedLocationId(e.target.value)}
+                className="w-full appearance-none bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-xl pl-7 pr-6 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer shadow-2xs truncate"
+                title={t('select_location')}
+              >
+                {ZIMBABWE_LOCATIONS.map((loc) => (
+                  <option key={loc.id} value={loc.id}>
+                    {loc.name} (R{loc.naturalRegion})
+                  </option>
+                ))}
+              </select>
+              <MapPin className="w-3.5 h-3.5 text-emerald-700 absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+
+            <button
+              onClick={handleDetectGps}
+              disabled={isGpsLocating}
+              title={t('gps_detect')}
+              className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold transition flex items-center gap-1 shrink-0 cursor-pointer"
+            >
+              <Compass className={`w-3.5 h-3.5 ${isGpsLocating ? 'animate-spin' : ''}`} />
+              <span className="text-[11px]">GPS</span>
+            </button>
+
+            <button
+              onClick={() => handleOpenWhatsAppModal()}
+              className="px-2.5 py-1.5 bg-[#25D366] hover:bg-[#1EBE5D] text-white rounded-xl text-xs font-bold transition flex items-center gap-1 shrink-0 cursor-pointer shadow-2xs"
+              title="Open WhatsApp Helpline"
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-black">WA</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Dynamic System Page Tabs: Full Desktop Strip (>= 768px) */}
+        <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-1 overflow-x-auto no-scrollbar border-t border-slate-100 py-2">
             {visiblePages.map((page) => {
               const Icon = page.icon;
@@ -467,7 +683,7 @@ function AppContent() {
       </header>
 
       {/* Main Content Area */}
-      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 flex-1">
+      <main className="max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 flex-1 pb-24 md:pb-8">
         {/* ==================== ROLE-TAILORED DASHBOARD BANNERS ==================== */}
         {isDeveloper ? (
           /* DEVELOPER COMMAND CONSOLE DASHBOARD */
@@ -573,126 +789,370 @@ function AppContent() {
           onNavigateToWeather={() => setActiveNavTab('weather')}
         />
 
-        {activeNavTab === 'crops' && (
-          <CropRecommendationEngine 
-            selectedLocation={currentLocation}
-            onSelectCropForYieldAnalysis={handleSelectCropForYield}
-            onSelectCropForPlanner={handleSelectCropForPlanner}
-            onNavigateToProfile={() => setActiveNavTab('profile')}
-          />
-        )}
+        <Suspense fallback={<ModuleLoadingSkeleton />}>
+          {activeNavTab === 'crops' && (
+            <CropRecommendationEngine 
+              selectedLocation={currentLocation}
+              onSelectCropForYieldAnalysis={handleSelectCropForYield}
+              onSelectCropForPlanner={handleSelectCropForPlanner}
+              onNavigateToProfile={() => setActiveNavTab('profile')}
+            />
+          )}
 
-        {activeNavTab === 'planner' && (
-          <PlantingHarvestPlanner
-            selectedLocation={currentLocation}
-            preselectedCrop={preselectedCropForPlanner}
-          />
-        )}
+          {activeNavTab === 'planner' && (
+            <PlantingHarvestPlanner
+              selectedLocation={currentLocation}
+              preselectedCrop={preselectedCropForPlanner}
+            />
+          )}
 
-        {activeNavTab === 'weather' && (
-          <LocalWeatherStationsView
-            currentLocation={currentLocation}
-            onApplyStationDataToAdvisor={handleApplyStationData}
-          />
-        )}
+          {activeNavTab === 'weather' && (
+            <LocalWeatherStationsView
+              currentLocation={currentLocation}
+              onApplyStationDataToAdvisor={handleApplyStationData}
+            />
+          )}
 
-        {activeNavTab === 'yield' && (
-          <YieldAndInputAnalysis 
-            selectedLocation={currentLocation}
-            preselectedCrop={preselectedCropForYield}
-          />
-        )}
+          {activeNavTab === 'yield' && (
+            <YieldAndInputAnalysis 
+              selectedLocation={currentLocation}
+              preselectedCrop={preselectedCropForYield}
+            />
+          )}
 
-        {activeNavTab === 'health' && (
-          <HealthDiagnostics 
-            currentLocationName={`${currentLocation.name}, ${currentLocation.province} (Region ${currentLocation.naturalRegion})`}
-            selectedLocation={currentLocation}
-            isOfflineMode={!isOnline}
-          />
-        )}
+          {activeNavTab === 'health' && (
+            <HealthDiagnostics 
+              currentLocationName={`${currentLocation.name}, ${currentLocation.province} (Region ${currentLocation.naturalRegion})`}
+              selectedLocation={currentLocation}
+              isOfflineMode={!isOnline}
+            />
+          )}
 
-        {activeNavTab === 'geofence' && (
-          <GeoFencingMonitor />
-        )}
+          {activeNavTab === 'geofence' && (
+            <GeoFencingMonitor />
+          )}
 
-        {activeNavTab === 'market' && (
-          <MarketPriceDiscovery 
-            currentLocationName={currentLocation.name}
-          />
-        )}
+          {activeNavTab === 'market' && (
+            <MarketPriceDiscovery 
+              currentLocationName={currentLocation.name}
+            />
+          )}
 
-        {activeNavTab === 'forum' && (
-          <CommunityForum
-            currentLocationName={`${currentLocation.name}, ${currentLocation.province}`}
-            isOfflineMode={!isOnline}
-          />
-        )}
+          {activeNavTab === 'forum' && (
+            <CommunityForum
+              currentLocationName={`${currentLocation.name}, ${currentLocation.province}`}
+              isOfflineMode={!isOnline}
+            />
+          )}
 
-        {activeNavTab === 'advisor' && (
-          <AgritexAssistant 
-            currentLocation={currentLocation}
-            farmerProfileContext={farmerProfileContext}
-          />
-        )}
+          {activeNavTab === 'advisor' && (
+            <AgritexAssistant 
+              currentLocation={currentLocation}
+              farmerProfileContext={farmerProfileContext}
+            />
+          )}
 
-        {activeNavTab === 'soil' && (
-          <SoilQualityAssessment
-            selectedLocation={currentLocation}
-            onNavigateToPlanner={(cropId) => {
-              setActiveNavTab('planner');
-            }}
-            onNavigateToCropAdvisor={() => setActiveNavTab('crops')}
-          />
-        )}
+          {activeNavTab === 'soil' && (
+            <SoilQualityAssessment
+              selectedLocation={currentLocation}
+              onNavigateToPlanner={(cropId) => {
+                setActiveNavTab('planner');
+              }}
+              onNavigateToCropAdvisor={() => setActiveNavTab('crops')}
+            />
+          )}
 
-        {activeNavTab === 'dictionary' && (
-          <FarmersDictionaryAndWhatsApp
-            currentLocation={currentLocation}
-            onOpenWhatsAppModal={handleOpenWhatsAppModal}
-          />
-        )}
+          {activeNavTab === 'dictionary' && (
+            <FarmersDictionaryAndWhatsApp
+              currentLocation={currentLocation}
+              onOpenWhatsAppModal={handleOpenWhatsAppModal}
+            />
+          )}
 
-        {activeNavTab === 'manuals' && (
-          <CropManualsLibrary
-            currentLocation={currentLocation}
-            onSelectCropForPlanner={handleSelectCropForPlannerByName}
-          />
-        )}
+          {activeNavTab === 'manuals' && (
+            <CropManualsLibrary
+              currentLocation={currentLocation}
+              onSelectCropForPlanner={handleSelectCropForPlannerByName}
+            />
+          )}
 
-        {activeNavTab === 'profile' && (
-          <FarmerProfileView
-            currentLocation={currentLocation}
-            onSyncAppLocation={(locId) => setSelectedLocationId(locId)}
-            onNavigateToAssistant={(farmerContext) => {
-              setFarmerProfileContext(farmerContext);
-              setActiveNavTab('advisor');
-            }}
-            onNavigateToPlanner={(cropName) => {
-              handleSelectCropForPlannerByName(cropName);
-            }}
-          />
-        )}
+          {activeNavTab === 'profile' && (
+            <FarmerProfileView
+              currentLocation={currentLocation}
+              onSyncAppLocation={(locId) => setSelectedLocationId(locId)}
+              onNavigateToAssistant={(farmerContext) => {
+                setFarmerProfileContext(farmerContext);
+                setActiveNavTab('advisor');
+              }}
+              onNavigateToPlanner={(cropName) => {
+                handleSelectCropForPlannerByName(cropName);
+              }}
+            />
+          )}
 
-        {/* Page 14: Facebook Page Hub (Exclusively for Authenticated Developer) */}
-        {activeNavTab === 'facebook' && isDeveloper && (
-          <FacebookPageHub
-            currentLocation={currentLocation}
-            onOpenWhatsAppModal={handleOpenWhatsAppModal}
-          />
-        )}
+          {/* Page 14: Facebook Page Hub (Exclusively for Authenticated Developer) */}
+          {activeNavTab === 'facebook' && isDeveloper && (
+            <FacebookPageHub
+              currentLocation={currentLocation}
+              onOpenWhatsAppModal={handleOpenWhatsAppModal}
+            />
+          )}
+
+          {/* Page 15: Operations & Telemetry Center (Enterprise Staff) */}
+          {activeNavTab === 'telemetry' && isEnterpriseStaff && (
+            <SystemHealthDashboard />
+          )}
+        </Suspense>
       </main>
 
-      {/* Floating WhatsApp Quick Action Button */}
+      {/* 2G Feature Phone USSD & SMS Simulator Modal */}
+      <UssdTerminalSimulator 
+        isOpen={isUssdOpen} 
+        onClose={() => setIsUssdOpen(false)} 
+      />
+
+      {/* Floating WhatsApp Quick Action Button (Safely elevated on mobile above bottom nav) */}
       <button
         onClick={() => handleOpenWhatsAppModal()}
-        className="fixed bottom-5 right-5 z-40 bg-[#25D366] hover:bg-[#1EBE5D] active:bg-[#1DA851] text-white p-3.5 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group cursor-pointer border-2 border-white/40"
+        className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 bg-[#25D366] hover:bg-[#1EBE5D] active:bg-[#1DA851] text-white p-3 sm:p-3.5 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group cursor-pointer border-2 border-white/40"
         title="Connect with Agricultural Advisors on WhatsApp"
         aria-label="Connect to WhatsApp"
       >
-        <MessageSquare className="w-5 h-5 fill-current" />
+        <MessageSquare className="w-4 sm:w-5 h-4 sm:h-5 fill-current" />
         <span className="hidden sm:inline font-black text-xs pr-1">WhatsApp Hub</span>
         <span className="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
       </button>
+
+      {/* Mobile Bottom Quick Navigation Bar (< 768px: thumb-friendly touch targets) */}
+      <nav 
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-2xl px-1.5 py-1 flex items-center justify-around pb-[calc(0.4rem+env(safe-area-inset-bottom))]"
+        aria-label="Mobile Navigation"
+      >
+        <button
+          onClick={() => setActiveNavTab('crops')}
+          className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl text-[10px] font-bold transition flex-1 min-h-[44px] cursor-pointer ${
+            activeNavTab === 'crops' ? 'text-emerald-800 font-black' : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <div className={`p-1 rounded-lg ${activeNavTab === 'crops' ? 'bg-emerald-100 text-emerald-800' : ''}`}>
+            <Sprout className="w-4 h-4" />
+          </div>
+          <span className="truncate max-w-[65px]">{t('tab_crops')}</span>
+        </button>
+
+        <button
+          onClick={() => setActiveNavTab('weather')}
+          className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl text-[10px] font-bold transition flex-1 min-h-[44px] cursor-pointer ${
+            activeNavTab === 'weather' ? 'text-emerald-800 font-black' : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <div className={`p-1 rounded-lg ${activeNavTab === 'weather' ? 'bg-emerald-100 text-emerald-800' : ''}`}>
+            <Activity className="w-4 h-4" />
+          </div>
+          <span className="truncate max-w-[65px]">{t('tab_weather')}</span>
+        </button>
+
+        <button
+          onClick={() => setActiveNavTab('dictionary')}
+          className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl text-[10px] font-bold transition flex-1 min-h-[44px] cursor-pointer ${
+            activeNavTab === 'dictionary' ? 'text-emerald-800 font-black' : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <div className={`p-1 rounded-lg ${activeNavTab === 'dictionary' ? 'bg-emerald-100 text-emerald-800' : ''}`}>
+            <BookOpen className="w-4 h-4" />
+          </div>
+          <span className="truncate max-w-[65px]">Dictionary</span>
+        </button>
+
+        <button
+          onClick={() => setActiveNavTab('market')}
+          className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl text-[10px] font-bold transition flex-1 min-h-[44px] cursor-pointer ${
+            activeNavTab === 'market' ? 'text-emerald-800 font-black' : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <div className={`p-1 rounded-lg ${activeNavTab === 'market' ? 'bg-emerald-100 text-emerald-800' : ''}`}>
+            <Store className="w-4 h-4" />
+          </div>
+          <span className="truncate max-w-[65px]">{t('tab_market')}</span>
+        </button>
+
+        <button
+          onClick={() => setIsMobileMenuOpen(true)}
+          className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl text-[10px] font-bold transition flex-1 min-h-[44px] cursor-pointer ${
+            isMobileMenuOpen || !['crops', 'weather', 'dictionary', 'market'].includes(activeNavTab)
+              ? 'text-emerald-800 font-black'
+              : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <div className={`p-1 rounded-lg relative ${
+            isMobileMenuOpen || !['crops', 'weather', 'dictionary', 'market'].includes(activeNavTab)
+              ? 'bg-emerald-100 text-emerald-800'
+              : ''
+          }`}>
+            <Grid className="w-4 h-4" />
+            {!['crops', 'weather', 'dictionary', 'market'].includes(activeNavTab) && (
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+            )}
+          </div>
+          <span className="truncate max-w-[65px]">All {visiblePages.length} Pgs</span>
+        </button>
+      </nav>
+
+      {/* Mobile All Modules Full-Screen / Sheet Modal */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex flex-col justify-end sm:justify-center p-0 sm:p-4 overflow-y-auto animate-in fade-in"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div 
+            className="bg-white w-full max-w-xl mx-auto rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] animate-in slide-in-from-bottom duration-200"
+          >
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-emerald-900 to-slate-900 text-white px-5 py-4 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center justify-center font-black">
+                  🌾
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm sm:text-base text-white">
+                    All Agricultural Modules
+                  </h3>
+                  <p className="text-[11px] text-emerald-200">
+                    {visiblePages.length} Full Advisory Modules • Tap to navigate
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
+                aria-label="Close menu"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* User Profile Info Card inside Drawer */}
+            <div className="p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 ${
+                  isDeveloper ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'
+                }`}>
+                  {isDeveloper ? '👑' : '🌾'}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-black text-slate-900 truncate">
+                    {currentUser.name}
+                  </div>
+                  <div className="text-[10px] font-bold text-slate-500 truncate">
+                    {isDeveloper ? 'Authorized Developer (14 Pages)' : 'Smallholder Farmer (13 Pages)'}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="px-2.5 py-1 text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg text-xs font-bold transition flex items-center gap-1 shrink-0 cursor-pointer"
+              >
+                <LogOut className="w-3 h-3" />
+                <span>Logout</span>
+              </button>
+            </div>
+
+            {/* List of All System Pages */}
+            <div className="p-3 sm:p-4 overflow-y-auto space-y-1.5 flex-1">
+              <div className="text-[10px] font-extrabold uppercase text-slate-400 px-2 pb-1 tracking-wider">
+                System Pages (1 - {visiblePages.length})
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                {visiblePages.map((page) => {
+                  const Icon = page.icon;
+                  const isActive = activeNavTab === page.id;
+                  const isPage14 = page.pageNum === 14;
+
+                  return (
+                    <button
+                      key={page.id}
+                      onClick={() => {
+                        setActiveNavTab(page.id as any);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className={`w-full p-2.5 rounded-2xl text-xs font-bold text-left transition flex items-center justify-between gap-3 min-h-[46px] cursor-pointer ${
+                        isActive
+                          ? isPage14
+                            ? 'bg-[#1877F2] text-white shadow-md'
+                            : 'bg-emerald-800 text-white shadow-md'
+                          : isPage14
+                          ? 'bg-blue-50 text-blue-900 hover:bg-blue-100 border border-blue-200'
+                          : 'bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200/80'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                          isActive 
+                            ? 'bg-white/20 text-white' 
+                            : isPage14 
+                            ? 'bg-blue-200 text-blue-900' 
+                            : 'bg-emerald-100 text-emerald-800'
+                        }`}>
+                          <Icon className="w-3.5 h-3.5" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="truncate">{page.label}</span>
+                            {isPage14 && (
+                              <span className="bg-amber-400 text-slate-950 text-[9px] font-black px-1 rounded uppercase">
+                                Dev
+                              </span>
+                            )}
+                          </div>
+                          <span className={`text-[10px] block leading-none mt-0.5 ${
+                            isActive ? 'text-white/80' : 'text-slate-400'
+                          }`}>
+                            Module #{page.pageNum}
+                          </span>
+                        </div>
+                      </div>
+
+                      {isActive ? (
+                        <span className="w-5 h-5 rounded-full bg-white text-emerald-800 flex items-center justify-center text-xs font-black shrink-0">
+                          ✓
+                        </span>
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Bottom Drawer Actions */}
+            <div className="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-2 shrink-0">
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  handleOpenWhatsAppModal();
+                }}
+                className="flex-1 py-2 bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>WhatsApp Helpline</span>
+              </button>
+
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* WhatsApp Direct Connect Modal */}
       <WhatsAppConnectModal
@@ -729,8 +1189,56 @@ function AppContent() {
             </strong>
             Farmers Dictionary Zw is an independent private educational and farm records platform. It is not affiliated with, authorized by, sponsored by, or an official agency of Agritex (Department of Agricultural Technical and Extension Services), the Ministry of Lands, Agriculture, Fisheries, Water and Rural Development, or any statutory board. All agronomic models, dosage rates, market estimates, and calculations are provided for informational and planning purposes only. Farmers should consult their local registered agricultural specialist or agrochemical label instructions before making critical commercial or application decisions.
           </div>
+
+          {/* Bottom Transparency & Legal Governance Links */}
+          <div className="pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+            <span className="font-medium text-slate-400">
+              © 2026 Farmers Dictionary Zw • National Agro-Advisory Network
+            </span>
+            <div className="flex items-center gap-4 text-[11px] text-slate-400 font-medium flex-wrap">
+              <button
+                type="button"
+                onClick={() => setCurrentView('website')}
+                className="hover:text-emerald-400 transition cursor-pointer underline underline-offset-2 flex items-center gap-1 font-bold text-slate-300"
+              >
+                <ArrowLeft className="w-3 h-3 text-emerald-400" />
+                <span>Return to Public Website</span>
+              </button>
+              <span>•</span>
+              <button
+                type="button"
+                onClick={() => setTransparencyModal({ isOpen: true, doc: 'terms' })}
+                className="hover:text-emerald-400 transition cursor-pointer underline underline-offset-2"
+              >
+                Terms of Service
+              </button>
+              <span>•</span>
+              <button
+                type="button"
+                onClick={() => setTransparencyModal({ isOpen: true, doc: 'privacy' })}
+                className="hover:text-teal-400 transition cursor-pointer underline underline-offset-2"
+              >
+                Privacy Policy
+              </button>
+              <span>•</span>
+              <button
+                type="button"
+                onClick={() => setTransparencyModal({ isOpen: true, doc: 'ussd' })}
+                className="hover:text-amber-400 transition cursor-pointer underline underline-offset-2"
+              >
+                USSD Gateway (*144#)
+              </button>
+            </div>
+          </div>
         </div>
       </footer>
+
+      {/* Comprehensive 1,000+ Word Transparency & Legal Governance Modal */}
+      <TransparencyDocumentModal
+        isOpen={transparencyModal.isOpen}
+        initialDoc={transparencyModal.doc}
+        onClose={() => setTransparencyModal(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 }

@@ -186,32 +186,32 @@ export const WhatsAppConnectModal: React.FC<WhatsAppConnectModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs overflow-y-auto">
       <div 
-        className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-emerald-900/10 overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200"
+        className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full shadow-2xl border border-emerald-900/10 overflow-hidden flex flex-col max-h-[92dvh] animate-in fade-in zoom-in-95 duration-200"
         role="dialog"
         aria-modal="true"
       >
         {/* Header with authentic WhatsApp Green Gradient */}
-        <div className="bg-gradient-to-r from-emerald-800 via-[#128C7E] to-[#25D366] text-white px-5 sm:px-6 py-4 flex items-center justify-between shrink-0 shadow-md">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/20 border border-white/30 backdrop-blur-xs flex items-center justify-center shadow-inner text-xl">
+        <div className="bg-gradient-to-r from-emerald-800 via-[#128C7E] to-[#25D366] text-white px-3.5 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 shrink-0 shadow-md">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-white/20 border border-white/30 backdrop-blur-xs flex items-center justify-center shadow-inner text-base sm:text-xl shrink-0">
               💬
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-base sm:text-lg tracking-tight">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <h3 className="font-extrabold text-sm sm:text-lg tracking-tight truncate">
                   WhatsApp Advisory Gateway
                 </h3>
-                <span className="bg-emerald-950/40 text-emerald-100 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-400/30">
-                  Farmers Dictionary Zw
+                <span className="bg-emerald-950/40 text-emerald-100 text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full border border-emerald-400/30 shrink-0">
+                  Farmers Dict Zw
                 </span>
               </div>
-              <p className="text-xs text-emerald-100 flex items-center gap-1.5 mt-0.5">
-                <MapPin className="w-3.5 h-3.5 shrink-0" />
-                <span>{currentLocation.name} (Region {currentLocation.naturalRegion})</span>
+              <p className="text-[11px] sm:text-xs text-emerald-100 flex items-center gap-1 sm:gap-1.5 mt-0.5 truncate">
+                <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="truncate">{currentLocation.name} (R{currentLocation.naturalRegion})</span>
                 <span>•</span>
-                <span className="inline-flex items-center gap-1 font-semibold text-emerald-200">
-                  <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
-                  Direct & Universal Share
+                <span className="inline-flex items-center gap-1 font-semibold text-emerald-200 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span>
+                  Direct Share
                 </span>
               </p>
             </div>
@@ -219,7 +219,7 @@ export const WhatsAppConnectModal: React.FC<WhatsAppConnectModalProps> = ({
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition"
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition shrink-0 cursor-pointer"
             aria-label="Close modal"
           >
             <X className="w-4 h-4" />

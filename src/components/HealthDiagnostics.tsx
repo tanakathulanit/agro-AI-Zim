@@ -22,7 +22,10 @@ import {
   X,
   Info,
   Flame,
-  MapPin
+  MapPin,
+  Clock,
+  Download,
+  FileText
 } from 'lucide-react';
 
 import { 
@@ -82,7 +85,33 @@ export const HealthDiagnostics: React.FC<Props> = ({
   isOfflineMode = false 
 }) => {
   // Navigation tabs inside Health & Diagnostics
-  const [activeView, setActiveView] = useState<'scanner' | 'database' | 'chemicals' | 'outbreaks'>('scanner');
+  const [activeView, setActiveView] = useState<'scanner' | 'database' | 'chemicals' | 'outbreaks' | 'history'>('scanner');
+
+  // Field Diagnostics History & Audit Trail State
+  const [historyRecords, setHistoryRecords] = useState<any[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState<boolean>(false);
+  const [historyTargetFilter, setHistoryTargetFilter] = useState<'all' | 'plant' | 'livestock'>('all');
+
+  const fetchHistory = async () => {
+    setIsLoadingHistory(true);
+    try {
+      const res = await fetch(`/api/diagnostics/history?targetType=${historyTargetFilter}`);
+      const data = await res.json();
+      if (data.success && data.history) {
+        setHistoryRecords(data.history);
+      }
+    } catch (err) {
+      console.warn('Could not load diagnostic history:', err);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (activeView === 'history') {
+      fetchHistory();
+    }
+  }, [activeView, historyTargetFilter]);
 
   // Nearby community outbreaks telemetry for farmer's location
   const farmerCoords = useMemo(() => {
@@ -151,6 +180,38 @@ export const HealthDiagnostics: React.FC<Props> = ({
     setIsCameraActive(false);
   };
 
+  // Client-Side Canvas Image Compressor: Cuts 10MB camera captures down to ~150KB for fast 3G transmission
+  const compressImage = (dataUrl: string, maxDimension = 960, quality = 0.82): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDimension || h > maxDimension) {
+          if (w > h) {
+            h = Math.round((h * maxDimension) / w);
+            w = maxDimension;
+          } else {
+            w = Math.round((w * maxDimension) / h);
+            h = maxDimension;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        } else {
+          resolve(dataUrl);
+        }
+      };
+      img.onerror = () => resolve(dataUrl);
+      img.src = dataUrl;
+    });
+  };
+
   const captureCameraFrame = () => {
     if (!videoRef.current) return;
     const canvas = document.createElement('canvas');
@@ -159,7 +220,7 @@ export const HealthDiagnostics: React.FC<Props> = ({
     const ctx = canvas.getContext('2d');
     if (ctx) {
       ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
       setSelectedImage(dataUrl);
       stopCamera();
     }
@@ -175,8 +236,10 @@ export const HealthDiagnostics: React.FC<Props> = ({
     }
 
     const reader = new FileReader();
-    reader.onload = () => {
-      setSelectedImage(reader.result as string);
+    reader.onload = async () => {
+      const rawData = reader.result as string;
+      const compressed = await compressImage(rawData);
+      setSelectedImage(compressed);
       stopCamera();
     };
     reader.readAsDataURL(file);
@@ -378,6 +441,18 @@ export const HealthDiagnostics: React.FC<Props> = ({
             >
               <FlaskConical className="w-3.5 h-3.5 text-emerald-600" />
               Agrochemical Register ({PRE_DOWNLOADED_AGROCHEMICAL_DB.length})
+            </button>
+
+            <button
+              onClick={() => setActiveView('history')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                activeView === 'history'
+                  ? 'bg-white text-emerald-800 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5 text-emerald-600" />
+              Field Audit Log ({historyRecords.length || 3})
             </button>
           </div>
         </div>
@@ -1170,6 +1245,167 @@ export const HealthDiagnostics: React.FC<Props> = ({
             setActiveView('chemicals');
           }}
         />
+      )}
+
+      {/* VIEW 5: FIELD DIAGNOSTIC HISTORY & AUDIT TRAIL */}
+      {activeView === 'history' && (
+        <div className="space-y-4">
+          {/* History Header & Controls */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-emerald-700" />
+                <span>Field Health Diagnostic History & Farm Audit Trail</span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                  {historyRecords.length} Audited Scans
+                </span>
+              </h4>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Every AI vision scan and field inspection is permanently logged with GPS context and agrochemical prescriptions.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <div className="flex bg-slate-100 p-0.5 rounded-xl text-xs font-bold">
+                {(['all', 'plant', 'livestock'] as const).map(f => (
+                  <button
+                    key={f}
+                    onClick={() => setHistoryTargetFilter(f)}
+                    className={`px-3 py-1 rounded-lg capitalize transition cursor-pointer ${
+                      historyTargetFilter === f
+                        ? 'bg-white text-emerald-800 shadow-xs'
+                        : 'text-slate-500 hover:text-slate-900'
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => {
+                  const headers = ['ID', 'Date', 'Specimen', 'Type', 'Diagnosis', 'Severity', 'Confidence', 'Prescription', 'Location'];
+                  const rows = historyRecords.map(r => [
+                    r.id,
+                    `"${r.timestamp}"`,
+                    `"${r.cropOrAnimal}"`,
+                    r.targetType,
+                    `"${r.diagnosis}"`,
+                    r.severity,
+                    `${r.confidenceScore}%`,
+                    `"${r.remedyProduct || 'N/A'}"`,
+                    `"${r.location}"`
+                  ]);
+                  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+                  const blob = new Blob([csv], { type: 'text/csv' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `field_health_audit_${Date.now()}.csv`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-emerald-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                title="Download Field Health Inspection Sheet as CSV"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Export CSV</span>
+              </button>
+            </div>
+          </div>
+
+          {/* History Records List */}
+          {isLoadingHistory ? (
+            <div className="bg-white rounded-2xl p-12 text-center border border-slate-200">
+              <RefreshCw className="w-6 h-6 animate-spin text-emerald-600 mx-auto mb-2" />
+              <p className="text-xs text-slate-500 font-bold">Loading persistent diagnostic records...</p>
+            </div>
+          ) : historyRecords.length === 0 ? (
+            <div className="bg-white rounded-2xl p-12 text-center border border-slate-200 space-y-2">
+              <Camera className="w-8 h-8 text-slate-300 mx-auto" />
+              <h5 className="font-bold text-slate-700 text-sm">No diagnostic scans recorded yet</h5>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                Scan your first leaf or livestock specimen using the Field Camera Scanner above to build your permanent farm health audit record.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {historyRecords.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-xs hover:shadow-md transition space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-2 border-b border-slate-100 pb-2.5">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                          item.severity === 'High'
+                            ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                            : 'bg-amber-100 text-amber-800 border border-amber-200'
+                        }`}>
+                          {item.severity} Severity
+                        </span>
+                        <span className="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full capitalize">
+                          {item.targetType}
+                        </span>
+                        <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full">
+                          {item.confidenceScore}% Confidence
+                        </span>
+                      </div>
+                      <h5 className="font-extrabold text-sm text-slate-900">
+                        {item.diagnosis}
+                      </h5>
+                      <span className="text-[11px] font-bold text-emerald-800">
+                        Specimen: {item.cropOrAnimal}
+                      </span>
+                    </div>
+
+                    <span className="text-[10px] text-slate-400 font-medium shrink-0">
+                      {item.timestamp}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex items-center gap-1.5 text-slate-600 text-[11px]">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span className="truncate">{item.location}</span>
+                    </div>
+
+                    {item.notes && (
+                      <p className="text-[11px] text-slate-600 bg-slate-50 p-2 rounded-xl border border-slate-100 italic">
+                        "{item.notes}"
+                      </p>
+                    )}
+
+                    {item.remedyProduct && (
+                      <div className="p-2.5 bg-emerald-50/70 border border-emerald-200/60 rounded-xl space-y-1">
+                        <span className="text-[10px] font-extrabold uppercase tracking-wide text-emerald-900 block">
+                          Official Prescription:
+                        </span>
+                        <span className="font-bold text-emerald-950 block text-[11.5px]">
+                          {item.remedyProduct}
+                        </span>
+                        {item.dosageInstructions && (
+                          <span className="text-[10.5px] text-emerald-800 block">
+                            Rate: {item.dosageInstructions}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10.5px]">
+                    <span className="text-slate-500 flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                      <span>{item.verifiedStatus || 'AI Verified'}</span>
+                    </span>
+                    <span className="text-slate-400">By {item.diagnosedBy}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       {/* FULL RECORD DOSSIER MODAL */}

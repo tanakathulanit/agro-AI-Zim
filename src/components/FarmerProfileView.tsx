@@ -41,6 +41,7 @@ import {
 import { ZIMBABWE_LOCATIONS, ZimbabweLocation } from '../data/zimbabweLocations';
 import { ALL_EXPANDED_CROPS } from '../data/allCropsDatabase';
 import { downloadFarmerProfileAdvisoryPDF } from '../utils/pdfAdvisoryGenerator';
+import { ZimbabweLiveFlag } from './ZimbabweLiveFlag';
 
 interface Props {
   currentLocation: ZimbabweLocation;
@@ -264,9 +265,14 @@ export const FarmerProfileView: React.FC<Props> = ({
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/10">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold tracking-wide uppercase">
-              <User className="w-3.5 h-3.5" />
-              <span>Personalized Agritex Farmer Profile</span>
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold tracking-wide uppercase">
+                <User className="w-3.5 h-3.5" />
+                <span>Personalized Agritex Farmer Profile & Settings</span>
+              </div>
+              <div className="px-2.5 py-1 rounded-xl bg-slate-950/70 border border-slate-700/60 flex items-center shadow-inner">
+                <ZimbabweLiveFlag size="sm" showPulseBadge={true} showCountryLabel={true} />
+              </div>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
               {profile.farmerName?.trim() || 'Manual Farmer Profile'}
@@ -739,14 +745,19 @@ export const FarmerProfileView: React.FC<Props> = ({
       {/* ============================================================== */}
       {activeTab === 'location' && (
         <div className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-6">
-          <div className="border-b border-slate-100 pb-4">
-            <h3 className="font-black text-slate-900 text-lg flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-emerald-600" />
-              <span>Specific Land Location & Natural Farming Region</span>
-            </h3>
-            <p className="text-xs text-slate-500 mt-1">
-              Select your exact district across Zimbabwe's 10 provinces. This automatically adjusts your agro-ecological rainfall threshold, sowing triggers, and Pfumvudza fertilizer recipes.
-            </p>
+          <div className="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="font-black text-slate-900 text-lg flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-emerald-600" />
+                <span>Specific Land Location & Natural Farming Region</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Select your exact district across Zimbabwe's 10 provinces. This automatically adjusts your agro-ecological rainfall threshold, sowing triggers, and Pfumvudza fertilizer recipes.
+              </p>
+            </div>
+            <div className="shrink-0 p-2.5 rounded-2xl bg-slate-950 border border-slate-800 shadow-md flex items-center">
+              <ZimbabweLiveFlag size="md" showPulseBadge={true} showCountryLabel={true} />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">

@@ -97,7 +97,7 @@ export const MicroLoanAuditStatementModal: React.FC<Props> = ({
         </div>
 
         {/* Borrower Customization Inputs Bar (Hidden in Print) */}
-        <div className="p-3 bg-slate-100 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs print:hidden shrink-0">
+        <div className="p-3 bg-slate-100 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-xs print:hidden shrink-0">
           <div>
             <label className="text-[10px] font-bold text-slate-500 uppercase block">Farmer Name</label>
             <input

@@ -7,7 +7,9 @@ import {
   CheckCircle, 
   RefreshCw,
   MessageSquare,
-  BookOpen
+  BookOpen,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { ZimbabweLocation } from '../data/zimbabweLocations';
 
@@ -18,6 +20,7 @@ interface Props {
 
 export const AgritexAssistant: React.FC<Props> = ({ currentLocation, farmerProfileContext }) => {
   const [question, setQuestion] = useState<string>('');
+  const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
   const [conversation, setConversation] = useState<Array<{ role: 'user' | 'assistant'; text: string }>>([
     {
       role: 'assistant',
@@ -25,6 +28,26 @@ export const AgritexAssistant: React.FC<Props> = ({ currentLocation, farmerProfi
     },
   ]);
   const [isAsking, setIsAsking] = useState<boolean>(false);
+
+  const handleSpeak = (text: string, idx: number) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+
+    if (speakingIdx === idx) {
+      window.speechSynthesis.cancel();
+      setSpeakingIdx(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    // Clean markdown formatting for smooth speech delivery
+    const cleanText = text.replace(/[*#_~`]/g, '');
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.rate = 0.95;
+    utterance.onend = () => setSpeakingIdx(null);
+    utterance.onerror = () => setSpeakingIdx(null);
+    setSpeakingIdx(idx);
+    window.speechSynthesis.speak(utterance);
+  };
 
   const sampleQuestions = [
     'When should I apply Ammonium Nitrate top dressing if rainfall is delayed?',
@@ -127,7 +150,7 @@ export const AgritexAssistant: React.FC<Props> = ({ currentLocation, farmerProfi
         {conversation.map((msg, idx) => (
           <div
             key={idx}
-            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
           >
             <div
               className={`max-w-[85%] rounded-2xl p-3.5 leading-relaxed ${
@@ -138,6 +161,26 @@ export const AgritexAssistant: React.FC<Props> = ({ currentLocation, farmerProfi
             >
               {msg.text}
             </div>
+            {msg.role === 'assistant' && (
+              <button
+                type="button"
+                onClick={() => handleSpeak(msg.text, idx)}
+                className="mt-1.5 text-[11px] text-emerald-800 hover:text-emerald-950 font-bold flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-2.5 py-1 rounded-lg transition cursor-pointer shadow-xs"
+                title="Listen aloud / Teerera Ruzivo"
+              >
+                {speakingIdx === idx ? (
+                  <>
+                    <VolumeX className="w-3.5 h-3.5 text-rose-600 animate-pulse" />
+                    <span className="text-rose-700 font-semibold">Stop Voice</span>
+                  </>
+                ) : (
+                  <>
+                    <Volume2 className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>🔊 Listen Aloud (Teerera Ruzivo)</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         ))}
 

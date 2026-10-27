@@ -552,29 +552,29 @@ _Shared from Farmers Dictionary Zw App_`;
       </div>
 
       {/* Sub-Navigation Buttons */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
+      <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 border-b border-slate-200 pb-3">
         <button
           onClick={() => setActiveSubTab('dictionary')}
-          className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold transition flex items-center gap-2 ${
+          className={`flex-1 min-w-[180px] justify-center px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold transition flex items-center gap-2 cursor-pointer ${
             activeSubTab === 'dictionary'
               ? 'bg-emerald-800 text-white shadow-md'
               : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          <BookOpen className="w-4 h-4" />
-          <span>Agricultural Dictionary ({FARMERS_DICTIONARY_ENTRIES.length} Terms)</span>
+          <BookOpen className="w-4 h-4 shrink-0" />
+          <span className="truncate">Agricultural Dictionary ({FARMERS_DICTIONARY_ENTRIES.length})</span>
         </button>
 
         <button
           onClick={() => setActiveSubTab('whatsapp_hub')}
-          className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold transition flex items-center gap-2 ${
+          className={`flex-1 min-w-[180px] justify-center px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold transition flex items-center gap-2 cursor-pointer ${
             activeSubTab === 'whatsapp_hub'
               ? 'bg-[#25D366] text-white shadow-md'
               : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
           }`}
         >
-          <MessageSquare className="w-4 h-4 text-[#25D366] group-hover:text-white" />
-          <span>WhatsApp Hub & Farmer Communities</span>
+          <MessageSquare className="w-4 h-4 text-[#25D366] group-hover:text-white shrink-0" />
+          <span className="truncate">WhatsApp Hub & Communities</span>
         </button>
       </div>
 
